@@ -19,77 +19,53 @@
  */
 package org.xwiki.contrib.kroki.configuration;
 
-import java.util.Collections;
+import java.util.Arrays;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.contrib.kroki.utils.HealthCheckRequestParameters;
 
 /**
- * Diagram generator configuration options for the main container.
+ * Diagram generator configuration options for Blockdiag container.
  *
  * @version $Id$
  */
 @Component
 @Singleton
-@Named("default-config")
-public class DefaultDiagramGeneratorConfiguration implements DiagramGeneratorConfiguration
+@Named("blockdiag-config")
+public class BlockdiagDiagramGeneratorConfiguration extends DefaultDiagramGeneratorConfiguration
 {
-    protected static final String PREFIX = "generate.";
-
-    @Inject
-    @Named("xwikiproperties")
-    protected ConfigurationSource configurationSource;
-
     @Override
     public String getKrokiDockerImage()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiDockerImage", "yuzutech/kroki");
+        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagDockerImage", "yuzutech/kroki-blockdiag");
     }
 
     @Override
     public String getKrokiDockerContainerName()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiDockerContainerName", "kroki");
+        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagDockerContainerName",
+            "kroki-blockdiag-container");
     }
 
     @Override
     public boolean isKrokiDockerContainerReusable()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiDockerContainerReusable", false);
-    }
-
-    @Override
-    public String getDockerNetwork()
-    {
-        return this.configurationSource.getProperty(PREFIX + "dockerNetwork", "bridge");
-    }
-
-    @Override
-    public String getKrokiHost()
-    {
-        return this.configurationSource.getProperty(PREFIX + "krokiHost", "");
+        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagDockerContainerReusable", true);
     }
 
     @Override
     public int getKrokiRemoteDebuggingPort()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiRemoteDebuggingPort", 8000);
-    }
-
-    @Override
-    public String getXWikiHost()
-    {
-        return this.configurationSource.getProperty(PREFIX + "xwikiHost", "host.xwiki.internal");
+        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagRemoteDebuggingPort", 8001);
     }
 
     @Override
     public HealthCheckRequestParameters getHealthCheckRequest()
     {
-        return new HealthCheckRequestParameters("", "", "GET", Collections.singletonList(200));
+        return new HealthCheckRequestParameters("/blockdiag/svg", "blockdiag {\n" + "   A;\n" + "}", "POST",
+            Arrays.asList(200, 201));
     }
 }

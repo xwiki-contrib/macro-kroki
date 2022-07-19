@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,109 +18,93 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-<!--  Error on mvn clean install-->
-<!--  <parent>-->
-<!--    <groupId>org.xwiki.contrib</groupId>-->
-<!--    <artifactId>parent-rendering</artifactId>-->
-<!--    <version>13.10</version>-->
-<!--  </parent>-->
-  <groupId>org.xwiki.contrib.kroki</groupId>
-  <artifactId>macro-kroki</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <name>Kroki Macro</name>
-  <description>Macro integrating Kroki diagram drawing service into XWiki</description>
-  <properties>
-    <rendering.version>13.10.7</rendering.version>
-    <dockerJava.version>3.2.13</dockerJava.version>
-    <xwiki.issueManagement.jira.id>XKROKI</xwiki.issueManagement.jira.id>
-  </properties>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>8</source>
-          <target>8</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.7.2</version>
-        <configuration>
-          <includes>
-            <include>**/IntegrationTests.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  <scm>
-    <connection>scm:git:git://github.com/xwiki-contrib/macro-kroki.git</connection>
-    <developerConnection>scm:git:git@github.com:xwiki-contrib/macro-kroki.git</developerConnection>
-    <url>https://github.com/xwiki-contrib/macro-kroki</url>
-    <tag>HEAD</tag>
-  </scm>
-  <developers>
-    <developer>
-      <id>dapostu</id>
-      <name>Apostu Daniel</name>
-    </developer>
-  </developers>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-event</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-transformation-macro</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-resource-temporary</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model-api</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.github.docker-java</groupId>
-      <artifactId>docker-java-core</artifactId>
-      <version>${dockerJava.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.github.docker-java</groupId>
-      <artifactId>docker-java-transport-httpclient5</artifactId>
-      <version>${dockerJava.version}</version>
-    </dependency>
-    <!-- Testing dependencies -->
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-test</artifactId>
-      <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.xwiki.contrib</groupId>
+        <artifactId>parent-platform</artifactId>
+        <version>13.10</version>
+    </parent>
+    <groupId>org.xwiki.contrib.kroki</groupId>
+    <artifactId>macro-kroki</artifactId>
+    <version>1.3-SNAPSHOT</version>
+    <name>Kroki Macro</name>
+    <description>Macro integrating Kroki diagram drawing service into XWiki</description>
+    <packaging>jar</packaging>
+    <properties>
+        <dockerJava.version>3.2.13</dockerJava.version>
+        <xwiki.jacoco.instructionRatio>0.16</xwiki.jacoco.instructionRatio>
+        <xwiki.extension.name>Kroki Diagram Generation Macro</xwiki.extension.name>
+        <xwiki.issueManagement.jira.id>XKROKI</xwiki.issueManagement.jira.id>
+    </properties>
+    <scm>
+        <connection>scm:git:git://github.com/xwiki-contrib/macro-kroki.git</connection>
+        <developerConnection>scm:git:git@github.com:xwiki-contrib/macro-kroki.git</developerConnection>
+        <url>https://github.com/xwiki-contrib/macro-kroki</url>
+        <tag>HEAD</tag>
+    </scm>
+    <developers>
+        <developer>
+            <id>dapostu</id>
+            <name>Apostu Daniel</name>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <groupId>org.xwiki.rendering</groupId>
+            <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
+            <version>${rendering.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xwiki.rendering</groupId>
+            <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+            <version>${rendering.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xwiki.rendering</groupId>
+            <artifactId>xwiki-rendering-syntax-event</artifactId>
+            <version>${rendering.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xwiki.rendering</groupId>
+            <artifactId>xwiki-rendering-transformation-macro</artifactId>
+            <version>${rendering.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-resource-temporary</artifactId>
+            <version>${platform.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-model-api</artifactId>
+            <version>${platform.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-core</artifactId>
+            <version>${dockerJava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-transport-httpclient5</artifactId>
+            <version>${dockerJava.version}</version>
+        </dependency>
+        <!-- Testing dependencies -->
+        <dependency>
+            <groupId>org.xwiki.rendering</groupId>
+            <artifactId>xwiki-rendering-test</artifactId>
+            <version>${rendering.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xwiki.commons</groupId>
+            <artifactId>xwiki-commons-tool-test-component</artifactId>
+            <version>${commons.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

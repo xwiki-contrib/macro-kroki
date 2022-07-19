@@ -1,11 +1,24 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.contrib.kroki.generator;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.xwiki.component.annotation.Component;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,25 +27,74 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeoutException;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.kroki.configuration.DiagramGeneratorConfiguration;
+import org.xwiki.contrib.kroki.utils.HealthCheckRequestParameters;
+
+/**
+ * Supports interaction with Kroki API endpoints.
+ *
+ * @version $Id$
+ */
 @Component(roles = KrokiConnectionManager.class)
 @Singleton
-public class KrokiConnectionManager {
+public class KrokiConnectionManager
+{
+    private static final int REMOTE_DEBUGGING_TIMEOUT = 10;
+
+    private static final String HTTP_PROTOCOL = "http://";
+
+    private static final String REQUEST_METHOD = "POST";
+
     @Inject
     private Logger logger;
 
     private String host;
+
     private int remoteDebuggingPort;
 
-    private static final int REMOTE_DEBUGGING_TIMEOUT = 10;
-
-    public void setup(String host, int remoteDebuggingPort) throws TimeoutException {
+    /**
+     * Sets up the paramaters to access a service.
+     *
+     * @param host the host address
+     * @param config the configuration of the docker container
+     * @throws TimeoutException if the service specified by the container does not respond in a period of time
+     */
+    public void setup(String host, DiagramGeneratorConfiguration config) throws TimeoutException
+    {
         this.logger.debug("Connecting to the Kroki server on [{}:{}].", host, remoteDebuggingPort);
         this.host = host;
-        this.remoteDebuggingPort = remoteDebuggingPort;
-        waitForKrokiService(REMOTE_DEBUGGING_TIMEOUT);
+        this.remoteDebuggingPort = config.getKrokiRemoteDebuggingPort();
+        waitForKrokiService(REMOTE_DEBUGGING_TIMEOUT, config.getHealthCheckRequest());
     }
 
-    private void waitForKrokiService(int timeoutSeconds) throws TimeoutException
+    /**
+     * Calls the Kroki API to generate a diagram from it's text representation according to the used library.
+     *
+     * @param diagramLib the diagram library to be used
+     * @param imgFormat the format of the generated image
+     * @param graphContent the content to be transformed
+     * @return the image's input stream
+     */
+    public InputStream generateDiagram(String diagramLib, String imgFormat, String graphContent)
+    {
+        try {
+            String url = HTTP_PROTOCOL + host + ':' + remoteDebuggingPort;
+            String path = '/' + diagramLib + '/' + imgFormat;
+            HttpURLConnection conn = createRequest(url, path, REQUEST_METHOD, graphContent);
+            return conn.getInputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void waitForKrokiService(int timeoutSeconds, HealthCheckRequestParameters healthParams)
+        throws TimeoutException
     {
         this.logger.debug("Waiting [{}] seconds to get our first response from kroki.", timeoutSeconds);
 
@@ -41,22 +103,21 @@ public class KrokiConnectionManager {
 
         while (System.currentTimeMillis() - start < timeoutMillis) {
             try {
-                URL url = new URL("http://" + host + ':' + remoteDebuggingPort);
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setRequestMethod("GET");
-                con.connect();
+                String url = HTTP_PROTOCOL + host + ':' + remoteDebuggingPort;
+                HttpURLConnection con =
+                    createRequest(url, healthParams.getPath(), healthParams.getHttpVerb(), healthParams.getBody());
                 int statusCode = con.getResponseCode();
-                if(statusCode != 200){
-                    throw new RuntimeException("Code received not 200");
+                if (!healthParams.getAcceptedStatusCodes().contains(statusCode)) {
+                    throw new RuntimeException("Code received is not accepted");
                 }
                 return;
             } catch (Exception e) {
-                this.logger.debug("Chrome remote debugging not available. Retrying in 2s.");
+                this.logger.debug("Kroki serevice not available. Retrying in 2s.");
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException ie) {
                     this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
-                            ExceptionUtils.getRootCauseMessage(e));
+                        ExceptionUtils.getRootCauseMessage(e));
                     // Restore the interrupted state.
                     Thread.currentThread().interrupt();
                 }
@@ -64,28 +125,28 @@ public class KrokiConnectionManager {
         }
 
         long waitTime = (System.currentTimeMillis() - start) / 1000;
-        throw new TimeoutException(String
-                .format("Timeout waiting for Chrome remote debugging to become available. Waited [%s] seconds.", waitTime));
+        throw new TimeoutException(
+            String.format("Timeout waiting for Kroki seervice to become available. Waited [%s] seconds.", waitTime));
     }
 
-    public InputStream generateDiagram(String diagramLib, String imgFormat, String graphContent){
-        try {
-            URL url = new URL("http://" + host + ':' + remoteDebuggingPort + '/' + diagramLib+ '/' + imgFormat);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            byte[] out = graphContent.getBytes(StandardCharsets.UTF_8);
-            conn.setFixedLengthStreamingMode(out.length);
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "text/plain; charset=UTF-8");
-            conn.setDoOutput(true);
-            conn.connect();
-            try (OutputStream os = conn.getOutputStream()) {
+    private HttpURLConnection createRequest(String url, String path, String httpVerb, String body) throws IOException
+    {
+        URL connectionURL = new URL(url + path);
+        HttpURLConnection con = (HttpURLConnection) connectionURL.openConnection();
+        con.setRequestMethod(httpVerb);
+        if (httpVerb.equals(REQUEST_METHOD) || httpVerb.equals("PUT")) {
+            byte[] out = body.getBytes(StandardCharsets.UTF_8);
+            con.setFixedLengthStreamingMode(out.length);
+            con.setRequestProperty("Content-Type", "text/plain; charset=UTF-8");
+            con.setDoOutput(true);
+            con.connect();
+            try (OutputStream os = con.getOutputStream()) {
                 os.write(out);
             }
+        } else {
+            con.connect();
+        }
 
-            return conn.getInputStream();
-        }
-        catch(IOException e){
-            throw new RuntimeException(e);
-        }
+        return con;
     }
 }

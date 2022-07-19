@@ -1,5 +1,9 @@
 org.xwiki.contrib.kroki.macro.KrokiMacro
 org.xwiki.contrib.kroki.docker.ContainerManager
 org.xwiki.contrib.kroki.generator.KrokiConnectionManager
-org.xwiki.contrib.kroki.configuration.DefaultDiagramGeneratorConfiguration
 org.xwiki.contrib.kroki.generator.KrokiDiagramGenerator
+org.xwiki.contrib.kroki.configuration.DefaultDiagramGeneratorConfiguration
+org.xwiki.contrib.kroki.configuration.BlockdiagDiagramGeneratorConfiguration
+org.xwiki.contrib.kroki.configuration.BpmnDiagramGeneratorConfiguration
+org.xwiki.contrib.kroki.configuration.ExcalidrawDiagramGeneratorConfiguration
+org.xwiki.contrib.kroki.configuration.MermaidDiagramGeneratorConfiguration

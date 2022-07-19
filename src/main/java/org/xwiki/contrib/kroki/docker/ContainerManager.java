@@ -1,24 +1,64 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.contrib.kroki.docker;
 
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.*;
-import com.github.dockerjava.api.exception.NotFoundException;
-import com.github.dockerjava.api.model.*;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.core.DockerClientImpl;
-import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
-import com.github.dockerjava.transport.DockerHttpClient;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.*;
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.AsyncDockerCmd;
+import com.github.dockerjava.api.command.CreateContainerCmd;
+import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.InspectContainerResponse;
+import com.github.dockerjava.api.command.SyncDockerCmd;
+import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.model.Bind;
+import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.ContainerNetwork;
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.Ports;
+import com.github.dockerjava.api.model.Volume;
+import com.github.dockerjava.core.DefaultDockerClientConfig;
+import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.DockerClientImpl;
+import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
+import com.github.dockerjava.transport.DockerHttpClient;
 
+/**
+ * Help perform various operations on Docker containers.
+ *
+ * @version $Id: 92e825542a069d9030e3d95d60492835ddb4c24d $
+ * @since 1.0
+ */
 @Component(roles = ContainerManager.class)
 @Singleton
 public class ContainerManager implements Initializable
@@ -35,8 +75,9 @@ public class ContainerManager implements Initializable
     {
         this.logger.debug("Initializing the Docker client.");
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
-        DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder().dockerHost(config.getDockerHost())
-                .sslConfig(config.getSSLConfig()).build();
+        DockerHttpClient httpClient =
+            new ApacheDockerHttpClient.Builder().dockerHost(config.getDockerHost()).sslConfig(config.getSSLConfig())
+                .build();
         this.client = DockerClientImpl.getInstance(config, httpClient);
     }
 
@@ -51,8 +92,8 @@ public class ContainerManager implements Initializable
     {
         this.logger.debug("Looking for an existing Docker container with name [{}].", containerName);
 
-        List<Container> containers =
-                exec(this.client.listContainersCmd().withNameFilter(Collections.singletonList(containerName)).withShowAll(true));
+        List<Container> containers = exec(
+            this.client.listContainersCmd().withNameFilter(Collections.singletonList(containerName)).withShowAll(true));
         if (containers.isEmpty()) {
             this.logger.debug("Could not find any Docker container with name [{}].", containerName);
             // There's no container with the specified name.
@@ -62,10 +103,9 @@ public class ContainerManager implements Initializable
         InspectContainerResponse container = inspectContainer(containers.get(0).getId());
         if (!reuse) {
             this.logger.debug("Docker container [{}] found but we can't reuse it.", container.getId());
-            try{
+            try {
                 removeContainer(container);
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 this.logger.debug("Error thrown in remove container [{}].", container.getId());
             }
             return null;
@@ -78,9 +118,10 @@ public class ContainerManager implements Initializable
             this.logger.debug("Docker container [{}] is paused. Unpausing it.", container.getId());
             exec(this.client.unpauseContainerCmd(container.getId()));
         } else if (container.getState().getRunning() != Boolean.TRUE
-                && container.getState().getRestarting() != Boolean.TRUE) {
+            && container.getState().getRestarting() != Boolean.TRUE)
+        {
             this.logger.debug("Docker container [{}] is neither running nor restarting. Starting it.",
-                    container.getId());
+                container.getId());
             this.startContainer(container.getId());
         }
 
@@ -124,18 +165,18 @@ public class ContainerManager implements Initializable
      * @return the id of the created container
      */
     public String createContainer(String imageName, String containerName, List<String> parameters,
-                                  HostConfig hostConfig)
+        HostConfig hostConfig)
     {
         this.logger.debug("Creating a Docker container with name [{}] using image [{}] and having parameters [{}].",
-                containerName, imageName, parameters);
+            containerName, imageName, parameters);
 
         // set extra hosts if network == bridge (using host.xwiki.internal:host-gateway)
 
         try (CreateContainerCmd createContainerCmd = this.client.createContainerCmd(imageName)) {
-            List<ExposedPort> exposedPorts =
-                    new ArrayList<>(hostConfig.getPortBindings().getBindings().keySet());
-            CreateContainerResponse container = createContainerCmd.withName(containerName).withCmd(parameters)
-                    .withExposedPorts(exposedPorts).withHostConfig(hostConfig).exec();
+            List<ExposedPort> exposedPorts = new ArrayList<>(hostConfig.getPortBindings().getBindings().keySet());
+            CreateContainerResponse container =
+                createContainerCmd.withName(containerName).withCmd(parameters).withExposedPorts(exposedPorts)
+                    .withHostConfig(hostConfig).exec();
             this.logger.debug("Created the Docker container with id [{}].", container.getId());
             return container.getId();
         }
@@ -155,8 +196,8 @@ public class ContainerManager implements Initializable
         portBindings.bind(exposedPort, Ports.Binding.bindPort(port));
 
         return HostConfig.newHostConfig().withAutoRemove(true).withNetworkMode(network).withBinds(
-                // Make sure it also works when XWiki is running in Docker.
-                new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK))).withPortBindings(portBindings);
+            // Make sure it also works when XWiki is running in Docker.
+            new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK))).withPortBindings(portBindings);
     }
 
     /**
@@ -191,6 +232,27 @@ public class ContainerManager implements Initializable
     }
 
     /**
+     * @param containerId the container id
+     * @param networkIdOrName the network id or name
+     * @return the IP address of the specified container in the specified network
+     */
+    public String getIpAddress(String containerId, String networkIdOrName)
+    {
+        Map<String, ContainerNetwork> networks = inspectContainer(containerId).getNetworkSettings().getNetworks();
+        // Try to find the network by name.
+        ContainerNetwork network = networks.get(networkIdOrName);
+        if (network == null) {
+            // Otherwise, find the network by id. Throw an exception if not found.
+            network = networks.values().stream().filter(n -> n.getNetworkID().equals(networkIdOrName)).findFirst()
+                .orElse(null);
+            if (network == null) {
+                throw new NullPointerException();
+            }
+        }
+        return network.getIpAddress();
+    }
+
+    /**
      * Remove the specified container.
      *
      * @param containerId the if of the container to remove
@@ -211,7 +273,8 @@ public class ContainerManager implements Initializable
             exec(this.client.unpauseContainerCmd(container.getId()));
             stopContainer(container.getId());
         } else if (container.getState().getRunning() == Boolean.TRUE
-                || container.getState().getRestarting() == Boolean.TRUE) {
+            || container.getState().getRestarting() == Boolean.TRUE)
+        {
             stopContainer(container.getId());
         }
         removeContainer(container.getId());
@@ -229,25 +292,6 @@ public class ContainerManager implements Initializable
         return exec(this.client.inspectContainerCmd(containerId));
     }
 
-    /**
-     * @param containerId the container id
-     * @param networkIdOrName the network id or name
-     * @return the IP address of the specified container in the specified network
-     */
-    public String getIpAddress(String containerId, String networkIdOrName)
-    {
-        Map<String, ContainerNetwork> networks = inspectContainer(containerId).getNetworkSettings().getNetworks();
-        // Try to find the network by name.
-        ContainerNetwork network = networks.get(networkIdOrName);
-        if (network == null) {
-            // Otherwise, find the network by id. Throw an exception if not found.
-            network = networks.values().stream().filter(n -> n.getNetworkID().equals(networkIdOrName)).findFirst()
-                    .orElse(null);
-            if(network == null) throw new NullPointerException();
-        }
-        return network.getIpAddress();
-    }
-
     private void wait(AsyncDockerCmd<?, ?> command)
     {
         // Can't write simply try(command) because spoon complains about "Variable resource not allowed here for source
@@ -256,7 +300,7 @@ public class ContainerManager implements Initializable
             cmd.start().awaitCompletion();
         } catch (InterruptedException e) {
             this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
-                    ExceptionUtils.getRootCauseMessage(e));
+                ExceptionUtils.getRootCauseMessage(e));
             // Restore the interrupted state.
             Thread.currentThread().interrupt();
         }
