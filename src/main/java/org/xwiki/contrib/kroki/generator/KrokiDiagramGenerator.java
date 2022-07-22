@@ -89,11 +89,7 @@ public class KrokiDiagramGenerator implements DiagramGenerator, Initializable, D
     @Override
     public void initialize() throws InitializationException
     {
-        String krokiHost = this.configuration.getKrokiHost();
-        if (StringUtils.isBlank(krokiHost)) {
-            krokiHost = initializeKrokiDockerContainer(this.configuration);
-        }
-        initializeKrokiService(krokiHost, this.configuration);
+        initializeService(this.configuration);
     }
 
     @Override
@@ -165,12 +161,14 @@ public class KrokiDiagramGenerator implements DiagramGenerator, Initializable, D
     private String initializeKrokiDockerContainer(DiagramGeneratorConfiguration config) throws InitializationException
     {
         this.logger.debug("Initializing the Docker container running the Kroki API.");
+
         ContainerManager containerManager = this.containerManagerProvider.get();
         String imageName = config.getKrokiDockerImage();
         String containerName = config.getKrokiDockerContainerName();
         String network = config.getDockerNetwork();
         int remoteDebuggingPort = config.getKrokiRemoteDebuggingPort();
         String configName = config.getClass().getName();
+
         try {
             this.containerIds.put(configName,
                 containerManager.maybeReuseContainerByName(containerName, config.isKrokiDockerContainerReusable()));
@@ -214,7 +212,6 @@ public class KrokiDiagramGenerator implements DiagramGenerator, Initializable, D
         if (StringUtils.isBlank(krokiHost)) {
             krokiHost = initializeKrokiDockerContainer(config);
         }
-
         initializeKrokiService(krokiHost, config);
     }
 }

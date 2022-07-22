@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -94,6 +95,12 @@ public class ContainerManager implements Initializable
 
         List<Container> containers = exec(
             this.client.listContainersCmd().withNameFilter(Collections.singletonList(containerName)).withShowAll(true));
+
+        if (!containers.isEmpty()) {
+            containers = containers.stream().filter(container -> container.getNames()[0].equals("/" + containerName))
+                .collect(Collectors.toList());
+        }
+
         if (containers.isEmpty()) {
             this.logger.debug("Could not find any Docker container with name [{}].", containerName);
             // There's no container with the specified name.

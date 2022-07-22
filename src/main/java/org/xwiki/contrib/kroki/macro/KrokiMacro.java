@@ -20,6 +20,7 @@
 package org.xwiki.contrib.kroki.macro;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +31,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.contrib.kroki.caching.DiagramCacheManager;
+import org.xwiki.contrib.kroki.caching.HashCreator;
 import org.xwiki.contrib.kroki.generator.DiagramGenerator;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -79,6 +82,9 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
     @Named("docker-kroki")
     private DiagramGenerator diagramGenerator;
 
+    @Inject
+    private DiagramCacheManager cacheManager;
+
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -99,13 +105,11 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
     {
         try {
             String source = extractSourceContentReference(context.getCurrentMacroBlock());
-            EntityReference reference = this.documentReferenceResolver.resolve(source);
+            EntityReference currentDocumentReference = this.documentReferenceResolver.resolve(source);
 
-            TemporaryResourceReference tempFileReference = new TemporaryResourceReference("krokiproto",
-                Arrays.asList("graph", UUID.randomUUID() + "." + parameters.getImgFormat()), reference);
-
-            this.temporaryResourceStore.createTemporaryFile(tempFileReference,
-                diagramGenerator.generateDiagram(parameters.getDiagramLib(), parameters.getImgFormat(), content));
+            TemporaryResourceReference tempFileReference =
+                getTemporaryResourceReference(parameters.getDiagramLib(), parameters.getImgFormat(), content,
+                    currentDocumentReference);
 
             String temporaryResourceURL =
                 this.urlTemporaryResourceReferenceSerializer.serialize(tempFileReference).serialize();
@@ -139,5 +143,28 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
             contentSource = (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE);
         }
         return contentSource;
+    }
+
+    private TemporaryResourceReference getTemporaryResourceReference(String diagramLibrary, String imgFormat,
+        String content, EntityReference docReference) throws IOException
+    {
+        String contentHash = null;
+        TemporaryResourceReference tempFileReference = null;
+        HashCreator hashCreator = new HashCreator();
+        try {
+            contentHash = hashCreator.createMD5Hash(diagramLibrary + imgFormat + content);
+            tempFileReference = cacheManager.getResourceFromCache(contentHash);
+        } catch (NoSuchAlgorithmException ignored) {
+        }
+
+        if (tempFileReference == null) {
+            tempFileReference = new TemporaryResourceReference("krokiproto",
+                Arrays.asList("diagram", UUID.randomUUID() + "." + imgFormat), docReference);
+            this.temporaryResourceStore.createTemporaryFile(tempFileReference,
+                diagramGenerator.generateDiagram(diagramLibrary, imgFormat, content));
+            cacheManager.addResourceToCache(contentHash, tempFileReference);
+        }
+
+        return tempFileReference;
     }
 }
