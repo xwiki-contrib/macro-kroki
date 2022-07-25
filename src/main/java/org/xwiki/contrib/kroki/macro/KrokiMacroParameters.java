@@ -20,56 +20,54 @@
 package org.xwiki.contrib.kroki.macro;
 
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
- * Parameters for the {@link org.xwiki.contrib.kroki.macro.KrokiMacro Macro.
+ * Parameters for the KrokiMacro.
  *
  * @version $Id$
  */
 public class KrokiMacroParameters
 {
-    private String diagramLib;
+    private String diagramType;
 
-    private String imgFormat;
+    private String outputType = "svg";
 
     /**
      * @return the type of diagram
      */
-    public String getDiagramLib()
+    public String getDiagramType()
     {
-        return diagramLib;
+        return diagramType;
     }
 
     /**
-     * Sets the library diagram.
-     *
-     * @param diagramLib the format of the image
+     * @param diagramType the type of diagram to be set
      */
     @PropertyMandatory
-    @PropertyDescription("The diagram library used by Kroki to generate the diagram")
-    public void setDiagramLib(String diagramLib)
+    @PropertyDescription("The diagram type to be rendered")
+    @PropertyDisplayType(String.class)
+    public void setDiagramType(String diagramType)
     {
-        this.diagramLib = diagramLib;
+        this.diagramType = diagramType;
     }
 
     /**
-     * @return the diagram's image format
+     * @return the type of output file to be rendered
      */
-    public String getImgFormat()
+    public String getOutputType()
     {
-        return imgFormat;
+        return outputType;
     }
 
     /**
-     * Sets the format of the image.
-     *
-     * @param imgFormat the format of the image
+     * @param outputType sets the type of file rendered
      */
-    @PropertyMandatory
-    @PropertyDescription("The image format for the returned graph")
-    public void setImgFormat(String imgFormat)
+    @PropertyDescription("The file format for the returned diagram")
+    @PropertyDisplayType(String.class)
+    public void setOutputType(String outputType)
     {
-        this.imgFormat = imgFormat;
+        this.outputType = outputType;
     }
 }

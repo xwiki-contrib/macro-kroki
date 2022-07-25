@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.kroki.configuration;
+package org.xwiki.contrib.kroki.internal.configuration;
 
 import java.util.Collections;
 
@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.contrib.kroki.configuration.KrokiMacroConfiguration;
 import org.xwiki.contrib.kroki.utils.HealthCheckRequestParameters;
 
 /**
@@ -36,10 +37,9 @@ import org.xwiki.contrib.kroki.utils.HealthCheckRequestParameters;
  */
 @Component
 @Singleton
-@Named("default-config")
-public class DefaultDiagramGeneratorConfiguration implements DiagramGeneratorConfiguration
+public class DefaultKrokiMacroConfiguration implements KrokiMacroConfiguration
 {
-    protected static final String PREFIX = "generate.";
+    protected static final String PREFIX = "contrib.krokiMacro";
 
     @Inject
     @Named("xwikiproperties")
@@ -54,7 +54,7 @@ public class DefaultDiagramGeneratorConfiguration implements DiagramGeneratorCon
     @Override
     public String getKrokiDockerContainerName()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiDockerContainerName", "kroki");
+        return this.configurationSource.getProperty(PREFIX + "krokiDockerContainerName", "kroki-diagram-generator");
     }
 
     @Override
@@ -64,27 +64,15 @@ public class DefaultDiagramGeneratorConfiguration implements DiagramGeneratorCon
     }
 
     @Override
-    public String getDockerNetwork()
-    {
-        return this.configurationSource.getProperty(PREFIX + "dockerNetwork", "bridge");
-    }
-
-    @Override
     public String getKrokiHost()
     {
         return this.configurationSource.getProperty(PREFIX + "krokiHost", "");
     }
 
     @Override
-    public int getKrokiRemoteDebuggingPort()
+    public int getKrokiPort()
     {
         return this.configurationSource.getProperty(PREFIX + "krokiRemoteDebuggingPort", 8000);
-    }
-
-    @Override
-    public String getXWikiHost()
-    {
-        return this.configurationSource.getProperty(PREFIX + "xwikiHost", "host.xwiki.internal");
     }
 
     @Override

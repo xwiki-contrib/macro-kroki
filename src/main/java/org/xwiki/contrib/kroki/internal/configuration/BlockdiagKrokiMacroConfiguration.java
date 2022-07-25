@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.kroki.configuration;
+package org.xwiki.contrib.kroki.internal.configuration;
 
 import java.util.Arrays;
 
@@ -28,44 +28,44 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.kroki.utils.HealthCheckRequestParameters;
 
 /**
- * Diagram generator configuration options for Mermaid container.
+ * Diagram generator configuration options for Blockdiag container.
  *
  * @version $Id$
  */
 @Component
 @Singleton
-@Named("mermaid-config")
-public class MermaidDiagramGeneratorConfiguration extends DefaultDiagramGeneratorConfiguration
+@Named("blockdiag-config")
+public class BlockdiagKrokiMacroConfiguration extends DefaultKrokiMacroConfiguration
 {
     @Override
     public String getKrokiDockerImage()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiMermaidDockerImage", "yuzutech/kroki-mermaid");
+        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagDockerImage", "yuzutech/kroki-blockdiag");
     }
 
     @Override
     public String getKrokiDockerContainerName()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiMermaidDockerContainerName",
-            "kroki-mermaid-container");
+        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagDockerContainerName",
+            "kroki-blockdiag-container");
     }
 
     @Override
     public boolean isKrokiDockerContainerReusable()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiMermaidDockerContainerReusable", true);
+        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagDockerContainerReusable", true);
     }
 
     @Override
-    public int getKrokiRemoteDebuggingPort()
+    public int getKrokiPort()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiMermaidRemoteDebuggingPort", 8002);
+        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagRemoteDebuggingPort", 8001);
     }
 
     @Override
     public HealthCheckRequestParameters getHealthCheckRequest()
     {
-        return new HealthCheckRequestParameters("/mermaid/svg", "graph TD;\n" + "    A-->B;", "POST",
+        return new HealthCheckRequestParameters("/blockdiag/svg", "blockdiag {\n" + "   A;\n" + "}", "POST",
             Arrays.asList(200, 201));
     }
 }

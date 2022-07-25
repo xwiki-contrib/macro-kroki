@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.kroki.configuration;
+package org.xwiki.contrib.kroki.internal.configuration;
 
 import java.util.Arrays;
 
@@ -28,44 +28,47 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.kroki.utils.HealthCheckRequestParameters;
 
 /**
- * Diagram generator configuration options for Blockdiag container.
+ * Diagram generator configuration options for Excalidraw container.
  *
  * @version $Id$
  */
 @Component
 @Singleton
-@Named("blockdiag-config")
-public class BlockdiagDiagramGeneratorConfiguration extends DefaultDiagramGeneratorConfiguration
+@Named("excalidraw-config")
+public class ExcalidrawKrokiMacroConfiguration extends DefaultKrokiMacroConfiguration
 {
     @Override
     public String getKrokiDockerImage()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagDockerImage", "yuzutech/kroki-blockdiag");
+        return this.configurationSource.getProperty(PREFIX + "krokiExcalidrawDockerImage", "yuzutech/kroki-excalidraw");
     }
 
     @Override
     public String getKrokiDockerContainerName()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagDockerContainerName",
-            "kroki-blockdiag-container");
+        return this.configurationSource.getProperty(PREFIX + "krokiExcalidrawDockerContainerName",
+            "kroki-excalidraw-container");
     }
 
     @Override
     public boolean isKrokiDockerContainerReusable()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagDockerContainerReusable", true);
+        return this.configurationSource.getProperty(PREFIX + "krokiExcalidrawDockerContainerReusable", true);
     }
 
     @Override
-    public int getKrokiRemoteDebuggingPort()
+    public int getKrokiPort()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiBlockdiagRemoteDebuggingPort", 8001);
+        return this.configurationSource.getProperty(PREFIX + "krokiExcalidrawRemoteDebuggingPort", 8004);
     }
 
     @Override
     public HealthCheckRequestParameters getHealthCheckRequest()
     {
-        return new HealthCheckRequestParameters("/blockdiag/svg", "blockdiag {\n" + "   A;\n" + "}", "POST",
-            Arrays.asList(200, 201));
+        return new HealthCheckRequestParameters("/excalidraw/svg",
+            "{\n" + "  \"type\": \"excalidraw\",\n" + "  \"version\": 2,\n"
+                + "  \"source\": \"https://excalidraw.com\",\n" + "  \"elements\": [\n" + "  ],\n"
+                + "  \"appState\": {\n" + "    \"gridSize\": null,\n" + "    \"viewBackgroundColor\": \"#ffffff\"\n"
+                + "  },\n" + "  \"files\": {}\n" + "}", "POST", Arrays.asList(200, 201));
     }
 }

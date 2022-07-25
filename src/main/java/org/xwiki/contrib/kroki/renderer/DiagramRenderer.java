@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.kroki.generator;
+package org.xwiki.contrib.kroki.renderer;
 
 import java.io.InputStream;
 
@@ -32,15 +32,15 @@ import org.xwiki.stability.Unstable;
  */
 @Role
 @Unstable
-public interface DiagramGenerator
+public interface DiagramRenderer
 {
     /**
-     * Creates an image from it's textual description.
+     * Renders an visual representation of a diagram from its textual description.
      *
-     * @param diagramLib diagram libaraey to be used
-     * @param imgFormat the format of the returned image
+     * @param diagramType type of diagram to be rendered
+     * @param outputType the file type of the resp
      * @param diagramContent the text content to be transformed
-     * @return the image's input stream
+     * @return the file's input stream
      */
-    InputStream generateDiagram(String diagramLib, String imgFormat, String diagramContent);
+    InputStream render(String diagramType, String outputType, String diagramContent);
 }

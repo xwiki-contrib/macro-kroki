@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.kroki.generator;
+package org.xwiki.contrib.kroki.renderer;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.contrib.kroki.configuration.DiagramGeneratorConfiguration;
-import org.xwiki.contrib.kroki.docker.ContainerManager;
+import org.xwiki.contrib.kroki.configuration.KrokiMacroConfiguration;
+import org.xwiki.contrib.kroki.internal.docker.ContainerManager;
+import org.xwiki.contrib.kroki.internal.rendrer.KrokiService;
+import org.xwiki.contrib.kroki.internal.rendrer.KrokiDiagramRenderer;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -45,7 +47,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
-class KrokiDiagramGeneratorTest
+class KrokiDiagramRendererTest
 {
     private final String containerId = "8f55a905efec";
 
@@ -54,14 +56,13 @@ class KrokiDiagramGeneratorTest
     HostConfig hostConfig;
 
     @InjectMockComponents
-    private KrokiDiagramGenerator krokiDiagramGenerator;
+    private KrokiDiagramRenderer krokiDiagramRenderer;
 
     @MockComponent
-    @Named("default-config")
-    private DiagramGeneratorConfiguration configuration;
+    private KrokiMacroConfiguration configuration;
 
     @MockComponent
-    private KrokiConnectionManager krokiManager;
+    private KrokiService krokiManager;
 
     @MockComponent
     private ContainerManager containerManager;
@@ -71,10 +72,9 @@ class KrokiDiagramGeneratorTest
     {
         when(this.configuration.getKrokiDockerContainerName()).thenReturn("test-kroki");
         when(this.configuration.getKrokiDockerImage()).thenReturn("yuzutech/kroki:latest");
-        when(this.configuration.getKrokiRemoteDebuggingPort()).thenReturn(8000);
-        when(this.configuration.getXWikiHost()).thenReturn("xwiki-host");
+        when(this.configuration.getKrokiPort()).thenReturn(8000);
 
-        mockNetwork("bridge", this.configuration);
+        mockNetwork(this.configuration);
 
         when(this.containerManager.createContainer(this.configuration.getKrokiDockerImage(),
             this.configuration.getKrokiDockerContainerName(),
@@ -95,16 +95,16 @@ class KrokiDiagramGeneratorTest
     {
         verify(this.containerManager).pullImage(this.configuration.getKrokiDockerImage());
         verify(this.containerManager).startContainer(this.containerId);
-        verify(this.krokiManager).setup(this.containerIpAddress, this.configuration);
+        verify(this.krokiManager).connect(this.containerIpAddress, this.configuration);
 
-        this.krokiDiagramGenerator.dispose();
+        this.krokiDiagramRenderer.dispose();
         verify(this.containerManager).stopContainer(this.containerId);
     }
 
     @BeforeComponent("initializeWithExistingContainer")
     void beforeInitializeWithExistingContainer()
     {
-        mockNetwork("test-container", this.configuration);
+        mockNetwork(this.configuration);
         when(this.configuration.isKrokiDockerContainerReusable()).thenReturn(true);
         when(this.containerManager.maybeReuseContainerByName(this.configuration.getKrokiDockerContainerName(), true))
             .thenReturn(this.containerId);
@@ -115,10 +115,9 @@ class KrokiDiagramGeneratorTest
     {
         verify(this.containerManager, never()).pullImage(any(String.class));
         verify(this.containerManager, never()).startContainer(any(String.class));
-        verify(this.hostConfig, never()).withExtraHosts(any(String.class));
-        verify(this.krokiManager).setup(this.containerIpAddress, this.configuration);
+        verify(this.krokiManager).connect(this.containerIpAddress, this.configuration);
 
-        this.krokiDiagramGenerator.dispose();
+        this.krokiDiagramRenderer.dispose();
         verify(this.containerManager).stopContainer(this.containerId);
     }
 
@@ -134,9 +133,9 @@ class KrokiDiagramGeneratorTest
         verify(this.containerManager, never()).maybeReuseContainerByName(any(String.class), any(Boolean.class));
         verify(this.containerManager, never()).startContainer(any(String.class));
 
-        verify(this.krokiManager).setup("remote-kroki", this.configuration);
+        verify(this.krokiManager).connect("remote-kroki", this.configuration);
 
-        this.krokiDiagramGenerator.dispose();
+        this.krokiDiagramRenderer.dispose();
         verify(this.containerManager, never()).stopContainer(any(String.class));
     }
 
@@ -144,7 +143,7 @@ class KrokiDiagramGeneratorTest
     void generateDiagramWithoutLibrary()
     {
         try {
-            this.krokiDiagramGenerator.generateDiagram(null, "svg", "digraph G {Hello->World}");
+            this.krokiDiagramRenderer.render(null, "svg", "digraph G {Hello->World}");
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("The diagram library to use is missing", e.getMessage());
@@ -155,7 +154,7 @@ class KrokiDiagramGeneratorTest
     void generateDiagramWithoutImageFormat()
     {
         try {
-            this.krokiDiagramGenerator.generateDiagram("graphviz", null, "digraph G {Hello->World}");
+            this.krokiDiagramRenderer.render("graphviz", null, "digraph G {Hello->World}");
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("The format of the image is missing", e.getMessage());
@@ -166,7 +165,7 @@ class KrokiDiagramGeneratorTest
     void generateDiagramWithoutGraphContent()
     {
         try {
-            this.krokiDiagramGenerator.generateDiagram("graphviz", "svg", null);
+            this.krokiDiagramRenderer.render("graphviz", "svg", null);
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("The content of the graph is missing", e.getMessage());
@@ -176,28 +175,25 @@ class KrokiDiagramGeneratorTest
     @Test
     void generateDiagram()
     {
-        String diagramLibrary = "graphviz";
-        String imgFormat = "svg";
-        String graphContent = "digraph G {Hello->World}";
+        String diagramType = "graphviz";
+        String outputType= "svg";
+        String diagramContent = "digraph G {Hello->World}";
 
         InputStream diagramInputStream = mock(InputStream.class);
 
-        when(this.krokiManager.generateDiagram(same(diagramLibrary), same(imgFormat), same(graphContent))).thenReturn(
+        when(this.krokiManager.renderDiagram(same(diagramType), same(outputType), same(diagramContent))).thenReturn(
             diagramInputStream);
 
         assertSame(diagramInputStream,
-            this.krokiDiagramGenerator.generateDiagram(diagramLibrary, imgFormat, graphContent));
+            this.krokiDiagramRenderer.render(diagramType, outputType, diagramContent));
     }
 
-    private void mockNetwork(String networkIdOrName, DiagramGeneratorConfiguration config)
+    private void mockNetwork(KrokiMacroConfiguration config)
     {
-        when(config.getDockerNetwork()).thenReturn(networkIdOrName);
-        when(this.containerManager.getIpAddress(this.containerId, networkIdOrName)).thenReturn(this.containerIpAddress);
+        when(this.containerManager.getIpAddress(this.containerId)).thenReturn(this.containerIpAddress);
 
         this.hostConfig = mock(HostConfig.class);
-        when(this.containerManager.getHostConfig(networkIdOrName, config.getKrokiRemoteDebuggingPort()))
-            .thenReturn(this.hostConfig);
-        when(this.hostConfig.withExtraHosts(config.getXWikiHost() + ":host-gateway"))
+        when(this.containerManager.getHostConfig(config.getKrokiPort()))
             .thenReturn(this.hostConfig);
     }
 }

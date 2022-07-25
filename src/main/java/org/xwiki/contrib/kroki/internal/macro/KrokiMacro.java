@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.kroki.macro;
+package org.xwiki.contrib.kroki.internal.macro;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -31,9 +31,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.contrib.kroki.caching.DiagramCacheManager;
-import org.xwiki.contrib.kroki.caching.HashCreator;
-import org.xwiki.contrib.kroki.generator.DiagramGenerator;
+import org.xwiki.contrib.kroki.internal.caching.DiagramCacheManager;
+import org.xwiki.contrib.kroki.internal.caching.HashCreator;
+import org.xwiki.contrib.kroki.macro.KrokiMacroParameters;
+import org.xwiki.contrib.kroki.renderer.DiagramRenderer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
@@ -79,8 +81,7 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
-    @Named("docker-kroki")
-    private DiagramGenerator diagramGenerator;
+    private DiagramRenderer diagramRenderer;
 
     @Inject
     private DiagramCacheManager cacheManager;
@@ -96,7 +97,7 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
     @Override
     public boolean supportsInlineMode()
     {
-        return true;
+        return false;
     }
 
     @Override
@@ -104,29 +105,25 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
         throws MacroExecutionException
     {
         try {
-            String source = extractSourceContentReference(context.getCurrentMacroBlock());
-            EntityReference currentDocumentReference = this.documentReferenceResolver.resolve(source);
+            EntityReference sourceDocumentReference = extractSourceDocumentReference(context.getCurrentMacroBlock());
 
-            TemporaryResourceReference tempFileReference =
-                getTemporaryResourceReference(parameters.getDiagramLib(), parameters.getImgFormat(), content,
-                    currentDocumentReference);
+            TemporaryResourceReference diagramFileReference =
+                getTemporaryResourceReference(parameters.getDiagramType(), parameters.getOutputType(), content,
+                    sourceDocumentReference);
 
             String temporaryResourceURL =
-                this.urlTemporaryResourceReferenceSerializer.serialize(tempFileReference).serialize();
+                this.urlTemporaryResourceReferenceSerializer.serialize(diagramFileReference).serialize();
 
             ResourceReference fileReference = new ResourceReference(temporaryResourceURL, ResourceType.URL);
             ImageBlock img = new ImageBlock(fileReference, true);
-            img.setParameter("alt", "Graph made with" + parameters.getDiagramLib());
+            String fileName = parameters.getDiagramType() + " diagram";
+            img.setParameter("alt", fileName);
             LinkBlock linkBlock = new LinkBlock(Collections.singletonList(img), fileReference, true);
-            linkBlock.setParameter("title", "Generated graph");
+            linkBlock.setParameter("title", fileName);
             linkBlock.setParameter("target", "_blank");
 
             Block resultBlock;
-            if (context.isInline()) {
-                resultBlock = linkBlock;
-            } else {
-                resultBlock = new ParagraphBlock(Collections.singletonList(linkBlock));
-            }
+            resultBlock = new ParagraphBlock(Collections.singletonList(linkBlock));
 
             return Collections.singletonList(resultBlock);
         } catch (IOException | SerializeResourceReferenceException | UnsupportedResourceReferenceException e) {
@@ -134,7 +131,7 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
         }
     }
 
-    private String extractSourceContentReference(Block source)
+    private DocumentReference extractSourceDocumentReference(Block source)
     {
         String contentSource = null;
         MetaDataBlock metaDataBlock =
@@ -142,26 +139,26 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
         if (metaDataBlock != null) {
             contentSource = (String) metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE);
         }
-        return contentSource;
+        return this.documentReferenceResolver.resolve(contentSource);
     }
 
-    private TemporaryResourceReference getTemporaryResourceReference(String diagramLibrary, String imgFormat,
+    private TemporaryResourceReference getTemporaryResourceReference(String diagramType, String outputType,
         String content, EntityReference docReference) throws IOException
     {
         String contentHash = null;
         TemporaryResourceReference tempFileReference = null;
         HashCreator hashCreator = new HashCreator();
         try {
-            contentHash = hashCreator.createMD5Hash(diagramLibrary + imgFormat + content);
+            contentHash = hashCreator.createMD5Hash(diagramType + outputType + content);
             tempFileReference = cacheManager.getResourceFromCache(contentHash);
         } catch (NoSuchAlgorithmException ignored) {
         }
 
         if (tempFileReference == null) {
-            tempFileReference = new TemporaryResourceReference("krokiproto",
-                Arrays.asList("diagram", UUID.randomUUID() + "." + imgFormat), docReference);
+            tempFileReference = new TemporaryResourceReference("kroki",
+                Arrays.asList(diagramType, UUID.randomUUID() + "." + outputType), docReference);
             this.temporaryResourceStore.createTemporaryFile(tempFileReference,
-                diagramGenerator.generateDiagram(diagramLibrary, imgFormat, content));
+                diagramRenderer.render(diagramType, outputType, content));
             cacheManager.addResourceToCache(contentHash, tempFileReference);
         }
 

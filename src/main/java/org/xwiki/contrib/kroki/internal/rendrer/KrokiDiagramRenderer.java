@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.kroki.generator;
+package org.xwiki.contrib.kroki.internal.rendrer;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,8 +36,9 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.contrib.kroki.configuration.DiagramGeneratorConfiguration;
-import org.xwiki.contrib.kroki.docker.ContainerManager;
+import org.xwiki.contrib.kroki.configuration.KrokiMacroConfiguration;
+import org.xwiki.contrib.kroki.renderer.DiagramRenderer;
+import org.xwiki.contrib.kroki.internal.docker.ContainerManager;
 
 import com.github.dockerjava.api.model.HostConfig;
 
@@ -48,40 +49,38 @@ import com.github.dockerjava.api.model.HostConfig;
  */
 @Component
 @Singleton
-@Named("docker-kroki")
-public class KrokiDiagramGenerator implements DiagramGenerator, Initializable, Disposable
+public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Disposable
 {
     private final Map<String, String> containerIds = new HashMap<>();
 
     @Inject
-    private KrokiConnectionManager krokiManager;
+    private KrokiService krokiService;
 
     @Inject
     private Logger logger;
 
     @Inject
-    @Named("default-config")
-    private DiagramGeneratorConfiguration configuration;
+    private KrokiMacroConfiguration configuration;
 
     @Inject
     @Named("blockdiag-config")
-    private DiagramGeneratorConfiguration configurationBlockdiag;
+    private KrokiMacroConfiguration configurationBlockdiag;
 
     @Inject
     @Named("bpmn-config")
-    private DiagramGeneratorConfiguration configurationBpmn;
+    private KrokiMacroConfiguration configurationBpmn;
 
     @Inject
     @Named("excalidraw-config")
-    private DiagramGeneratorConfiguration configurationExcalidraw;
+    private KrokiMacroConfiguration configurationExcalidraw;
 
     @Inject
     @Named("mermaid-config")
-    private DiagramGeneratorConfiguration configurationMermaid;
+    private KrokiMacroConfiguration configurationMermaid;
 
     /**
-     * We use a provider (i.e. lazy initialization) because we don't always need this component (e.g. when the PDF
-     * export is done through a hosted kroki api that is not managed by XWiki).
+     * We use a provider (i.e. lazy initialization) because we don't always need this component (e.g. when the diagram
+     * rendering is done through a hosted kroki api that is not managed by XWiki).
      */
     @Inject
     private Provider<ContainerManager> containerManagerProvider;
@@ -89,7 +88,7 @@ public class KrokiDiagramGenerator implements DiagramGenerator, Initializable, D
     @Override
     public void initialize() throws InitializationException
     {
-        initializeService(this.configuration);
+        initializeKrokiComponent(this.configuration);
     }
 
     @Override
@@ -116,30 +115,30 @@ public class KrokiDiagramGenerator implements DiagramGenerator, Initializable, D
     }
 
     @Override
-    public InputStream generateDiagram(String diagramLib, String imgFormat, String graphContent)
+    public InputStream render(String diagramType, String outputType, String diagramContent)
     {
-        if (StringUtils.isBlank(diagramLib)) {
+        if (StringUtils.isBlank(diagramType)) {
             throw new IllegalArgumentException("The diagram library to use is missing");
-        } else if (StringUtils.isBlank(imgFormat)) {
+        } else if (StringUtils.isBlank(outputType)) {
             throw new IllegalArgumentException("The format of the image is missing");
-        } else if (StringUtils.isBlank(graphContent)) {
+        } else if (StringUtils.isBlank(diagramContent)) {
             throw new IllegalArgumentException("The content of the graph is missing");
         }
 
-        DiagramGeneratorConfiguration libConfig = getLibraryConfiguration(diagramLib);
+        KrokiMacroConfiguration libConfig = getLibraryConfiguration(diagramType);
 
         try {
-            initializeService(libConfig);
+            initializeKrokiComponent(libConfig);
         } catch (InitializationException e) {
             throw new RuntimeException(e);
         }
 
-        return krokiManager.generateDiagram(diagramLib, imgFormat, graphContent);
+        return krokiService.renderDiagram(diagramType, outputType, diagramContent);
     }
 
-    private DiagramGeneratorConfiguration getLibraryConfiguration(String diagramLib)
+    private KrokiMacroConfiguration getLibraryConfiguration(String diagramType)
     {
-        switch (diagramLib) {
+        switch (diagramType) {
             case ("blockdiag"):
             case ("seqdiag"):
             case ("actdiag"):
@@ -158,15 +157,14 @@ public class KrokiDiagramGenerator implements DiagramGenerator, Initializable, D
         }
     }
 
-    private String initializeKrokiDockerContainer(DiagramGeneratorConfiguration config) throws InitializationException
+    private String initializeKrokiDockerContainer(KrokiMacroConfiguration config) throws InitializationException
     {
         this.logger.debug("Initializing the Docker container running the Kroki API.");
 
         ContainerManager containerManager = this.containerManagerProvider.get();
         String imageName = config.getKrokiDockerImage();
         String containerName = config.getKrokiDockerContainerName();
-        String network = config.getDockerNetwork();
-        int remoteDebuggingPort = config.getKrokiRemoteDebuggingPort();
+        int port = config.getKrokiPort();
         String configName = config.getClass().getName();
 
         try {
@@ -179,34 +177,29 @@ public class KrokiDiagramGenerator implements DiagramGenerator, Initializable, D
                     containerManager.pullImage(imageName);
                 }
 
-                HostConfig hostConfig = containerManager.getHostConfig(network, remoteDebuggingPort);
-                if ("bridge".equals(network)) {
-                    // The extra host is needed in order for the created container to be able to access the XWiki
-                    // instance running on the same machine as the Docker daemon.
-                    hostConfig = hostConfig.withExtraHosts(this.configuration.getXWikiHost() + ":host-gateway");
-                }
+                HostConfig hostConfig = containerManager.getHostConfig(port);
 
                 this.containerIds.put(configName,
                     containerManager.createContainer(imageName, containerName, new ArrayList<>(), hostConfig));
                 containerManager.startContainer(this.containerIds.get(configName));
             }
-            return containerManager.getIpAddress(this.containerIds.get(configName), network);
+            return containerManager.getIpAddress(this.containerIds.get(configName));
         } catch (Exception e) {
-            throw new InitializationException("Failed to initialize the Docker container for the graph generation.", e);
+            throw new InitializationException("Failed to initialize the Docker container for diagram rendering.", e);
         }
     }
 
-    private void initializeKrokiService(String host, DiagramGeneratorConfiguration config)
+    private void initializeKrokiService(String host, KrokiMacroConfiguration config)
         throws InitializationException
     {
         try {
-            this.krokiManager.setup(host, config);
+            this.krokiService.connect(host, config);
         } catch (Exception e) {
             throw new InitializationException("Failed to initialize the kroki remote debugging service.", e);
         }
     }
 
-    private void initializeService(DiagramGeneratorConfiguration config) throws InitializationException
+    private void initializeKrokiComponent(KrokiMacroConfiguration config) throws InitializationException
     {
         String krokiHost = config.getKrokiHost();
         if (StringUtils.isBlank(krokiHost)) {

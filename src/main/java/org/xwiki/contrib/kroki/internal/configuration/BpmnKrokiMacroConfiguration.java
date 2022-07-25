@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.kroki.configuration;
+package org.xwiki.contrib.kroki.internal.configuration;
 
 import java.util.Arrays;
 
@@ -35,7 +35,7 @@ import org.xwiki.contrib.kroki.utils.HealthCheckRequestParameters;
 @Component
 @Singleton
 @Named("bpmn-config")
-public class BpmnDiagramGeneratorConfiguration extends DefaultDiagramGeneratorConfiguration
+public class BpmnKrokiMacroConfiguration extends DefaultKrokiMacroConfiguration
 {
     @Override
     public String getKrokiDockerImage()
@@ -56,7 +56,7 @@ public class BpmnDiagramGeneratorConfiguration extends DefaultDiagramGeneratorCo
     }
 
     @Override
-    public int getKrokiRemoteDebuggingPort()
+    public int getKrokiPort()
     {
         return this.configurationSource.getProperty(PREFIX + "krokiBpmnRemoteDebuggingPort", 8003);
     }

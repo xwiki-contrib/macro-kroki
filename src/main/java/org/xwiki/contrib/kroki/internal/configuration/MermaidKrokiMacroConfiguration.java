@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.kroki.configuration;
+package org.xwiki.contrib.kroki.internal.configuration;
 
 import java.util.Arrays;
 
@@ -28,47 +28,44 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.contrib.kroki.utils.HealthCheckRequestParameters;
 
 /**
- * Diagram generator configuration options for Excalidraw container.
+ * Diagram generator configuration options for Mermaid container.
  *
  * @version $Id$
  */
 @Component
 @Singleton
-@Named("excalidraw-config")
-public class ExcalidrawDiagramGeneratorConfiguration extends DefaultDiagramGeneratorConfiguration
+@Named("mermaid-config")
+public class MermaidKrokiMacroConfiguration extends DefaultKrokiMacroConfiguration
 {
     @Override
     public String getKrokiDockerImage()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiExcalidrawDockerImage", "yuzutech/kroki-excalidraw");
+        return this.configurationSource.getProperty(PREFIX + "krokiMermaidDockerImage", "yuzutech/kroki-mermaid");
     }
 
     @Override
     public String getKrokiDockerContainerName()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiExcalidrawDockerContainerName",
-            "kroki-excalidraw-container");
+        return this.configurationSource.getProperty(PREFIX + "krokiMermaidDockerContainerName",
+            "kroki-mermaid-container");
     }
 
     @Override
     public boolean isKrokiDockerContainerReusable()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiExcalidrawDockerContainerReusable", true);
+        return this.configurationSource.getProperty(PREFIX + "krokiMermaidDockerContainerReusable", true);
     }
 
     @Override
-    public int getKrokiRemoteDebuggingPort()
+    public int getKrokiPort()
     {
-        return this.configurationSource.getProperty(PREFIX + "krokiExcalidrawRemoteDebuggingPort", 8004);
+        return this.configurationSource.getProperty(PREFIX + "krokiMermaidRemoteDebuggingPort", 8002);
     }
 
     @Override
     public HealthCheckRequestParameters getHealthCheckRequest()
     {
-        return new HealthCheckRequestParameters("/excalidraw/svg",
-            "{\n" + "  \"type\": \"excalidraw\",\n" + "  \"version\": 2,\n"
-                + "  \"source\": \"https://excalidraw.com\",\n" + "  \"elements\": [\n" + "  ],\n"
-                + "  \"appState\": {\n" + "    \"gridSize\": null,\n" + "    \"viewBackgroundColor\": \"#ffffff\"\n"
-                + "  },\n" + "  \"files\": {}\n" + "}", "POST", Arrays.asList(200, 201));
+        return new HealthCheckRequestParameters("/mermaid/svg", "graph TD;\n" + "    A-->B;", "POST",
+            Arrays.asList(200, 201));
     }
 }

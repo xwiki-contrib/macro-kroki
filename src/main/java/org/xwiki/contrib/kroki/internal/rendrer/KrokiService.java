@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.kroki.generator;
+package org.xwiki.contrib.kroki.internal.rendrer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +33,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.contrib.kroki.configuration.DiagramGeneratorConfiguration;
+import org.xwiki.contrib.kroki.configuration.KrokiMacroConfiguration;
 import org.xwiki.contrib.kroki.utils.HealthCheckRequestParameters;
 
 /**
@@ -41,11 +41,11 @@ import org.xwiki.contrib.kroki.utils.HealthCheckRequestParameters;
  *
  * @version $Id$
  */
-@Component(roles = KrokiConnectionManager.class)
+@Component(roles = KrokiService.class)
 @Singleton
-public class KrokiConnectionManager
+public class KrokiService
 {
-    private static final int REMOTE_DEBUGGING_TIMEOUT = 10;
+    private static final int CONNECTION_TIMEOUT = 10;
 
     private static final String HTTP_PROTOCOL = "http://";
 
@@ -56,7 +56,7 @@ public class KrokiConnectionManager
 
     private String host;
 
-    private int remoteDebuggingPort;
+    private int port;
 
     /**
      * Sets up the paramaters to access a service.
@@ -65,12 +65,14 @@ public class KrokiConnectionManager
      * @param config the configuration of the docker container
      * @throws TimeoutException if the service specified by the container does not respond in a period of time
      */
-    public void setup(String host, DiagramGeneratorConfiguration config) throws TimeoutException
+    public void connect(String host, KrokiMacroConfiguration config) throws TimeoutException
     {
-        this.logger.debug("Connecting to the Kroki server on [{}:{}].", host, remoteDebuggingPort);
         this.host = host;
-        this.remoteDebuggingPort = config.getKrokiRemoteDebuggingPort();
-        waitForKrokiService(REMOTE_DEBUGGING_TIMEOUT, config.getHealthCheckRequest());
+        this.port = config.getKrokiPort();
+
+        this.logger.debug("Connecting to the Kroki server on [{}:{}].", host, port);
+
+        waitForKrokiService(CONNECTION_TIMEOUT, config.getHealthCheckRequest());
     }
 
     /**
@@ -81,10 +83,10 @@ public class KrokiConnectionManager
      * @param graphContent the content to be transformed
      * @return the image's input stream
      */
-    public InputStream generateDiagram(String diagramLib, String imgFormat, String graphContent)
+    public InputStream renderDiagram(String diagramLib, String imgFormat, String graphContent)
     {
         try {
-            String url = HTTP_PROTOCOL + host + ':' + remoteDebuggingPort;
+            String url = HTTP_PROTOCOL + host + ':' + port;
             String path = '/' + diagramLib + '/' + imgFormat;
             HttpURLConnection conn = createRequest(url, path, REQUEST_METHOD, graphContent);
             return conn.getInputStream();
@@ -103,24 +105,23 @@ public class KrokiConnectionManager
 
         while (System.currentTimeMillis() - start < timeoutMillis) {
             try {
-                String url = HTTP_PROTOCOL + host + ':' + remoteDebuggingPort;
+                String url = HTTP_PROTOCOL + host + ':' + port;
                 HttpURLConnection con =
                     createRequest(url, healthParams.getPath(), healthParams.getHttpVerb(), healthParams.getBody());
                 int statusCode = con.getResponseCode();
-                if (!healthParams.getAcceptedStatusCodes().contains(statusCode)) {
-                    throw new RuntimeException("Code received is not accepted");
+                if (healthParams.getAcceptedStatusCodes().contains(statusCode)) {
+                    return;
                 }
-                return;
-            } catch (Exception e) {
-                this.logger.debug("Kroki serevice not available. Retrying in 2s.");
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ie) {
-                    this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
-                        ExceptionUtils.getRootCauseMessage(e));
-                    // Restore the interrupted state.
-                    Thread.currentThread().interrupt();
-                }
+            } catch (Exception ignored) {
+            }
+            this.logger.debug("Kroki serevice not available. Retrying in 2s.");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException ie) {
+                this.logger.warn("Interrupted thread [{}]. Root cause: [{}].", Thread.currentThread().getName(),
+                    ExceptionUtils.getRootCauseMessage(ie));
+                // Restore the interrupted state.
+                Thread.currentThread().interrupt();
             }
         }
 

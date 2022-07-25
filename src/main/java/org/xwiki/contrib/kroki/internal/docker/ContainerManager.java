@@ -17,12 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.contrib.kroki.docker;
+package org.xwiki.contrib.kroki.internal.docker;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -192,18 +193,16 @@ public class ContainerManager implements Initializable
     /**
      * Creates the host configuration.
      *
-     * @param network the network to join
      * @param port the port to expose (the port the container is going to listen to)
      * @return the host configuration
      */
-    public HostConfig getHostConfig(String network, int port)
+    public HostConfig getHostConfig(int port)
     {
         ExposedPort exposedPort = ExposedPort.tcp(port);
         Ports portBindings = new Ports();
         portBindings.bind(exposedPort, Ports.Binding.bindPort(port));
 
-        return HostConfig.newHostConfig().withAutoRemove(true).withNetworkMode(network).withBinds(
-            // Make sure it also works when XWiki is running in Docker.
+        return HostConfig.newHostConfig().withAutoRemove(true).withBinds(
             new Bind(DOCKER_SOCK, new Volume(DOCKER_SOCK))).withPortBindings(portBindings);
     }
 
@@ -240,22 +239,18 @@ public class ContainerManager implements Initializable
 
     /**
      * @param containerId the container id
-     * @param networkIdOrName the network id or name
      * @return the IP address of the specified container in the specified network
      */
-    public String getIpAddress(String containerId, String networkIdOrName)
+    public String getIpAddress(String containerId)
     {
         Map<String, ContainerNetwork> networks = inspectContainer(containerId).getNetworkSettings().getNetworks();
         // Try to find the network by name.
-        ContainerNetwork network = networks.get(networkIdOrName);
-        if (network == null) {
-            // Otherwise, find the network by id. Throw an exception if not found.
-            network = networks.values().stream().filter(n -> n.getNetworkID().equals(networkIdOrName)).findFirst()
-                .orElse(null);
-            if (network == null) {
-                throw new NullPointerException();
-            }
+        Optional<ContainerNetwork> optionalNetwork = networks.values().stream().findFirst();
+        if (!optionalNetwork.isPresent()) {
+            throw new NullPointerException();
         }
+
+        ContainerNetwork network = optionalNetwork.get();
         return network.getIpAddress();
     }
 
