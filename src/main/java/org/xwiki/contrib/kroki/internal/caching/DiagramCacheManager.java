@@ -47,7 +47,7 @@ public class DiagramCacheManager implements Initializable
 
     private static final int LIFE_SPAN = 604800;
 
-    private static final String CACHE_ID = "xwiki.store.kroki-cache";
+    private static final String CACHE_ID = "xwiki.store.kroki-cache-" + System.currentTimeMillis();
 
     @Inject
     private Logger logger;
