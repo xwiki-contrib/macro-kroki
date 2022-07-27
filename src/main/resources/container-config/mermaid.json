@@ -1,0 +1,14 @@
+{
+  "image": "yuzutech/kroki-mermaid",
+  "containerName": "kroki-mermaid-container",
+  "isContainerReusable": true,
+  "host": "",
+  "port": 8002,
+  "healthCheckRequestParameters":
+  {
+    "path": "/mermaid/svg",
+    "body": "graph TD;    A-->B;",
+    "httpVerb": "POST",
+    "acceptedStatusCodes": [200, 201]
+  }
+}

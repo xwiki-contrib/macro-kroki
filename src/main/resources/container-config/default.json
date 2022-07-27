@@ -1,0 +1,14 @@
+{
+  "image": "yuzutech/kroki",
+  "containerName": "kroki-diagram-generator",
+  "isContainerReusable": false,
+  "host": "",
+  "port": 8000,
+  "healthCheckRequestParameters":
+    {
+      "path": "",
+      "body": "",
+      "httpVerb": "GET",
+      "acceptedStatusCodes": [200]
+    }
+}

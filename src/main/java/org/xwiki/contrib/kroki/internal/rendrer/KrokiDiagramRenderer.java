@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -37,8 +36,9 @@ import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.contrib.kroki.configuration.KrokiMacroConfiguration;
-import org.xwiki.contrib.kroki.renderer.DiagramRenderer;
+import org.xwiki.contrib.kroki.internal.configuration.ConfigurationManger;
 import org.xwiki.contrib.kroki.internal.docker.ContainerManager;
+import org.xwiki.contrib.kroki.renderer.DiagramRenderer;
 
 import com.github.dockerjava.api.model.HostConfig;
 
@@ -59,24 +59,9 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
     @Inject
     private Logger logger;
 
-    @Inject
-    private KrokiMacroConfiguration configuration;
 
     @Inject
-    @Named("blockdiag-config")
-    private KrokiMacroConfiguration configurationBlockdiag;
-
-    @Inject
-    @Named("bpmn-config")
-    private KrokiMacroConfiguration configurationBpmn;
-
-    @Inject
-    @Named("excalidraw-config")
-    private KrokiMacroConfiguration configurationExcalidraw;
-
-    @Inject
-    @Named("mermaid-config")
-    private KrokiMacroConfiguration configurationMermaid;
+    private ConfigurationManger configurationManger;
 
     /**
      * We use a provider (i.e. lazy initialization) because we don't always need this component (e.g. when the diagram
@@ -88,7 +73,7 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
     @Override
     public void initialize() throws InitializationException
     {
-        initializeKrokiComponent(this.configuration);
+        initializeKrokiComponent(configurationManger.getConfiguration("plantuml"));
     }
 
     @Override
@@ -125,10 +110,9 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
             throw new IllegalArgumentException("The content of the graph is missing");
         }
 
-        KrokiMacroConfiguration libConfig = getLibraryConfiguration(diagramType);
-
+        KrokiMacroConfiguration diagramConfig = configurationManger.getConfiguration(diagramType);
         try {
-            initializeKrokiComponent(libConfig);
+            initializeKrokiComponent(diagramConfig);
         } catch (InitializationException e) {
             throw new RuntimeException(e);
         }
@@ -136,26 +120,6 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
         return krokiService.renderDiagram(diagramType, outputType, diagramContent);
     }
 
-    private KrokiMacroConfiguration getLibraryConfiguration(String diagramType)
-    {
-        switch (diagramType) {
-            case ("blockdiag"):
-            case ("seqdiag"):
-            case ("actdiag"):
-            case ("nwdiag"):
-            case ("packetdiag"):
-            case ("rackdiag"):
-                return configurationBlockdiag;
-            case ("mermaid"):
-                return configurationMermaid;
-            case ("bpmn"):
-                return configurationBpmn;
-            case ("excalidraw"):
-                return configurationExcalidraw;
-            default:
-                return configuration;
-        }
-    }
 
     private String initializeKrokiDockerContainer(KrokiMacroConfiguration config) throws InitializationException
     {
@@ -171,7 +135,7 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
             this.containerIds.put(configName,
                 containerManager.maybeReuseContainerByName(containerName, config.isKrokiDockerContainerReusable()));
             if (this.containerIds.get(configName) == null) {
-                // The container doesn't exist so we have to create it.
+                // The container doesn't exist, so we have to create it.
                 // But first we need to pull the image used to create the container, if we don't have it already.
                 if (!containerManager.isLocalImagePresent(imageName)) {
                     containerManager.pullImage(imageName);

@@ -36,8 +36,8 @@
     <packaging>jar</packaging>
     <properties>
         <dockerJava.version>3.2.13</dockerJava.version>
-        <xwiki.jacoco.instructionRatio>0.18</xwiki.jacoco.instructionRatio>
-        <xwiki.extension.name>Kroki Diagram Generation Macro</xwiki.extension.name>
+        <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
+        <xwiki.extension.name>Kroki Diagram Rendering Macro</xwiki.extension.name>
         <xwiki.issueManagement.jira.id>XKROKI</xwiki.issueManagement.jira.id>
         <checkstyle.suppressions.location>${basedir}/src/checkstyle/checkstyle-suppressions.xml</checkstyle.suppressions.location>
     </properties>
@@ -56,12 +56,7 @@
     <dependencies>
         <dependency>
             <groupId>org.xwiki.rendering</groupId>
-            <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
-            <version>${rendering.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xwiki.rendering</groupId>
-            <artifactId>xwiki-rendering-syntax-xhtml</artifactId>
+            <artifactId>xwiki-rendering-api</artifactId>
             <version>${rendering.version}</version>
         </dependency>
         <dependency>

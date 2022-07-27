@@ -1,0 +1,7 @@
+{
+  "default": ["graphviz", "pikchr", "erd", "vega", "vegalite", "ditaa", "nomnoml", "plantuml", "bytefield", "wavedrom", "svgbob", "c4plantuml", "structurizr", "umlet"],
+  "mermaid": ["mermaid"],
+  "bpmn": ["bpmn"],
+  "excalidraw": ["excalidraw"],
+  "blockdiag": ["blockdiag", "seqdiag", "actdiag", "nwdiag", "packetdiag", "rackdiag"]
+}

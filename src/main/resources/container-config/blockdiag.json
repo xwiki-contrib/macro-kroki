@@ -1,0 +1,14 @@
+{
+  "image": "yuzutech/kroki-blockdiag",
+  "containerName": "kroki-blockdiag-container",
+  "isContainerReusable": true,
+  "host": "",
+  "port": 8001,
+  "healthCheckRequestParameters":
+  {
+    "path": "/blockdiag/svg",
+    "body": "blockdiag { A;}",
+    "httpVerb": "POST",
+    "acceptedStatusCodes": [200, 201]
+  }
+}

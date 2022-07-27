@@ -1,0 +1,16 @@
+{
+  "image": "yuzutech/kroki-bpmn",
+  "containerName": "kroki-bpmn-container",
+  "isContainerReusable": true,
+  "host": "",
+  "port": 8003,
+  "healthCheckRequestParameters": {
+    "path": "/bpmn/svg",
+    "body": "<bpmn:definitions id='definitions_2' targetNamespace='http://www.bpmn-sketch-miner.ai' exporter='BPMN Sketch Miner' exporterVersion='1.17.6.3337'><bpmn:collaboration id='collaboration_3'><bpmn:participant id='participant_7' name='' processRef='process_6'/></bpmn:collaboration><bpmn:process id='process_6' isExecutable='false'><bpmn:laneSet id='laneSet_8'></bpmn:laneSet></bpmn:process><bpmndi:BPMNDiagram id='BPMNDiagram_4'><bpmndi:BPMNPlane id='BPMNPlane_5' bpmnElement='collaboration_3'><bpmndi:BPMNShape id='participant_7_di' bpmnElement='participant_7' isHorizontal='false'><dc:Bounds x='0' y='40' width='132' height='199'/></bpmndi:BPMNShape></bpmndi:BPMNPlane></bpmndi:BPMNDiagram></bpmn:definitions>",
+    "httpVerb": "POST",
+    "acceptedStatusCodes": [
+      200,
+      201
+    ]
+  }
+}

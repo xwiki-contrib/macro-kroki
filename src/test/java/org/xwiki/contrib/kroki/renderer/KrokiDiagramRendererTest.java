@@ -22,10 +22,11 @@ package org.xwiki.contrib.kroki.renderer;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import javax.inject.Named;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.xwiki.contrib.kroki.configuration.KrokiMacroConfiguration;
+import org.xwiki.contrib.kroki.internal.configuration.ConfigurationManger;
 import org.xwiki.contrib.kroki.internal.docker.ContainerManager;
 import org.xwiki.contrib.kroki.internal.rendrer.KrokiService;
 import org.xwiki.contrib.kroki.internal.rendrer.KrokiDiagramRenderer;
@@ -55,11 +56,13 @@ class KrokiDiagramRendererTest
 
     HostConfig hostConfig;
 
+    private KrokiMacroConfiguration configuration;
+
     @InjectMockComponents
     private KrokiDiagramRenderer krokiDiagramRenderer;
 
     @MockComponent
-    private KrokiMacroConfiguration configuration;
+    private ConfigurationManger configurationManager;
 
     @MockComponent
     private KrokiService krokiManager;
@@ -70,11 +73,14 @@ class KrokiDiagramRendererTest
     @BeforeComponent
     void configure()
     {
+        configuration = mock(KrokiMacroConfiguration.class);
         when(this.configuration.getKrokiDockerContainerName()).thenReturn("test-kroki");
         when(this.configuration.getKrokiDockerImage()).thenReturn("yuzutech/kroki:latest");
         when(this.configuration.getKrokiPort()).thenReturn(8000);
 
         mockNetwork(this.configuration);
+
+        when(this.configurationManager.getConfiguration(any(String.class))).thenReturn(configuration);
 
         when(this.containerManager.createContainer(this.configuration.getKrokiDockerImage(),
             this.configuration.getKrokiDockerContainerName(),
@@ -93,6 +99,7 @@ class KrokiDiagramRendererTest
     @Test
     void initializeAndDispose() throws Exception
     {
+        verify(this.configurationManager).getConfiguration("plantuml");
         verify(this.containerManager).pullImage(this.configuration.getKrokiDockerImage());
         verify(this.containerManager).startContainer(this.containerId);
         verify(this.krokiManager).connect(this.containerIpAddress, this.configuration);
