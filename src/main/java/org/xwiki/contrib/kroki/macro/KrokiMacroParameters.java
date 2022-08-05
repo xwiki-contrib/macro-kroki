@@ -22,6 +22,7 @@ package org.xwiki.contrib.kroki.macro;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.properties.annotation.PropertyName;
 
 /**
  * Parameters for the KrokiMacro.
@@ -30,6 +31,15 @@ import org.xwiki.properties.annotation.PropertyMandatory;
  */
 public class KrokiMacroParameters
 {
+    /**
+     * The type used to associate a picker to the {@code diagramType} parameter.
+     *
+     * @see KrokiMacroParameters#setDiagramType(String)
+     */
+    public static class DiagramType
+    {
+    }
+
     private String diagramType;
 
     private String outputType = "svg";
@@ -46,8 +56,9 @@ public class KrokiMacroParameters
      * @param diagramType the type of diagram to be set
      */
     @PropertyMandatory
+    @PropertyName("Diagram Type")
     @PropertyDescription("The diagram type to be rendered")
-    @PropertyDisplayType(String.class)
+    @PropertyDisplayType(DiagramType.class)
     public void setDiagramType(String diagramType)
     {
         this.diagramType = diagramType;
@@ -64,8 +75,9 @@ public class KrokiMacroParameters
     /**
      * @param outputType sets the type of file rendered
      */
+    @PropertyName("Output Type")
     @PropertyDescription("The file format for the returned diagram")
-    @PropertyDisplayType(String.class)
+    @PropertyDisplayType(OutputType.class)
     public void setOutputType(String outputType)
     {
         this.outputType = outputType;

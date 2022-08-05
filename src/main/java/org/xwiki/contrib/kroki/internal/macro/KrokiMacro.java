@@ -49,6 +49,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.resource.ResourceReferenceSerializer;
 import org.xwiki.resource.SerializeResourceReferenceException;
@@ -91,7 +92,8 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
      */
     public KrokiMacro()
     {
-        super("Kroki", DESCRIPTION, KrokiMacroParameters.class);
+        super("Kroki", DESCRIPTION, new DefaultContentDescriptor("Diagram content to be rendered by kroki", true,
+            Block.LIST_BLOCK_TYPE), KrokiMacroParameters.class);
     }
 
     @Override

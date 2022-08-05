@@ -76,7 +76,7 @@ public class KrokiService
     }
 
     /**
-     * Calls the Kroki API to generate a diagram from it's text representation according to the used library.
+     * Calls the Kroki API to generate a diagram from its text representation according to the used library.
      *
      * @param diagramLib the diagram library to be used
      * @param imgFormat the format of the generated image
@@ -86,6 +86,7 @@ public class KrokiService
     public InputStream renderDiagram(String diagramLib, String imgFormat, String graphContent)
     {
         try {
+            //TO TEST
             String url = HTTP_PROTOCOL + host + ':' + port;
             String path = '/' + diagramLib + '/' + imgFormat;
             HttpURLConnection conn = createRequest(url, path, REQUEST_METHOD, graphContent);

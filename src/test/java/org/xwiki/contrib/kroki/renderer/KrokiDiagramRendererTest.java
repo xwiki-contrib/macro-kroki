@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.xwiki.contrib.kroki.configuration.KrokiMacroConfiguration;
 import org.xwiki.contrib.kroki.internal.configuration.ConfigurationManger;

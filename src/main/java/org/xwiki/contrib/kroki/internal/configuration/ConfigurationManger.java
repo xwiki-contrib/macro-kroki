@@ -22,6 +22,7 @@ package org.xwiki.contrib.kroki.internal.configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,5 +129,13 @@ public class ConfigurationManger implements Initializable
         }
 
         return configuration;
+    }
+
+    /**
+     * @return list of diagram types supported that can be generated
+     */
+    public List<String> getDiagramTypes()
+    {
+        return new ArrayList<>(diagramTypeToConfigFileMap.keySet());
     }
 }

@@ -4,3 +4,4 @@ org.xwiki.contrib.kroki.internal.rendrer.KrokiService
 org.xwiki.contrib.kroki.internal.rendrer.KrokiDiagramRenderer
 org.xwiki.contrib.kroki.internal.caching.DiagramCacheManager
 org.xwiki.contrib.kroki.internal.configuration.ConfigurationManger
+org.xwiki.contrib.kroki.internal.services.DiagramTypesService
