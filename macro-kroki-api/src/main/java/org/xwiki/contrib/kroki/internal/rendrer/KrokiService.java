@@ -50,6 +50,7 @@ public class KrokiService
     private static final String HTTP_PROTOCOL = "http://";
 
     private static final String REQUEST_METHOD = "POST";
+    private static final String URL_PATH_SEPARATOR = "/";
 
     @Inject
     private Logger logger;
@@ -78,22 +79,35 @@ public class KrokiService
     /**
      * Calls the Kroki API to generate a diagram from its text representation according to the used library.
      *
-     * @param diagramLib the diagram library to be used
-     * @param imgFormat the format of the generated image
+     * @param diagramType the diagram library to be used
+     * @param outputType the format of the generated image
      * @param graphContent the content to be transformed
      * @return the image's input stream
      */
-    public InputStream renderDiagram(String diagramLib, String imgFormat, String graphContent)
+    public InputStream renderDiagram(String diagramType, String outputType, String graphContent)
     {
         try {
-            //TO TEST
-            String url = HTTP_PROTOCOL + host + ':' + port;
-            String path = '/' + diagramLib + '/' + imgFormat;
-            HttpURLConnection conn = createRequest(url, path, REQUEST_METHOD, graphContent);
+            String path = createRequestPath(HTTP_PROTOCOL, host, String.valueOf(port), diagramType, outputType);
+            HttpURLConnection conn = createRequest(path, REQUEST_METHOD, graphContent);
             return conn.getInputStream();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Creates a path for the Kroki request.
+     * @param protocol http protocol
+     * @param host host to send the request to
+     * @param port request port
+     * @param diagramType the type of diagram
+     * @param outputType the type of file returned by the request
+     * @return the path of the Kroki request
+     */
+    public String createRequestPath(String protocol, String host, String port, String diagramType, String outputType)
+    {
+        String path = "";
+        return path + protocol + host + ":" + port + URL_PATH_SEPARATOR + diagramType + URL_PATH_SEPARATOR + outputType;
     }
 
     private void waitForKrokiService(int timeoutSeconds, HealthCheckRequestParameters healthParams)
@@ -108,7 +122,7 @@ public class KrokiService
             try {
                 String url = HTTP_PROTOCOL + host + ':' + port;
                 HttpURLConnection con =
-                    createRequest(url, healthParams.getPath(), healthParams.getHttpVerb(), healthParams.getBody());
+                    createRequest(url + healthParams.getPath(), healthParams.getHttpVerb(), healthParams.getBody());
                 int statusCode = con.getResponseCode();
                 if (healthParams.getAcceptedStatusCodes().contains(statusCode)) {
                     return;
@@ -131,9 +145,9 @@ public class KrokiService
             String.format("Timeout waiting for Kroki seervice to become available. Waited [%s] seconds.", waitTime));
     }
 
-    private HttpURLConnection createRequest(String url, String path, String httpVerb, String body) throws IOException
+    private HttpURLConnection createRequest(String path, String httpVerb, String body) throws IOException
     {
-        URL connectionURL = new URL(url + path);
+        URL connectionURL = new URL(path);
         HttpURLConnection con = (HttpURLConnection) connectionURL.openConnection();
         con.setRequestMethod(httpVerb);
         if (httpVerb.equals(REQUEST_METHOD) || httpVerb.equals("PUT")) {

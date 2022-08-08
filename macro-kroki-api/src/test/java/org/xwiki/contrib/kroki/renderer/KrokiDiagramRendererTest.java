@@ -64,7 +64,7 @@ class KrokiDiagramRendererTest
     private ConfigurationManger configurationManager;
 
     @MockComponent
-    private KrokiService krokiManager;
+    private KrokiService krokiService;
 
     @MockComponent
     private ContainerManager containerManager;
@@ -101,7 +101,7 @@ class KrokiDiagramRendererTest
         verify(this.configurationManager).getConfiguration("plantuml");
         verify(this.containerManager).pullImage(this.configuration.getKrokiDockerImage());
         verify(this.containerManager).startContainer(this.containerId);
-        verify(this.krokiManager).connect(this.containerIpAddress, this.configuration);
+        verify(this.krokiService).connect(this.containerIpAddress, this.configuration);
 
         this.krokiDiagramRenderer.dispose();
         verify(this.containerManager).stopContainer(this.containerId);
@@ -121,7 +121,7 @@ class KrokiDiagramRendererTest
     {
         verify(this.containerManager, never()).pullImage(any(String.class));
         verify(this.containerManager, never()).startContainer(any(String.class));
-        verify(this.krokiManager).connect(this.containerIpAddress, this.configuration);
+        verify(this.krokiService).connect(this.containerIpAddress, this.configuration);
 
         this.krokiDiagramRenderer.dispose();
         verify(this.containerManager).stopContainer(this.containerId);
@@ -139,7 +139,7 @@ class KrokiDiagramRendererTest
         verify(this.containerManager, never()).maybeReuseContainerByName(any(String.class), any(Boolean.class));
         verify(this.containerManager, never()).startContainer(any(String.class));
 
-        verify(this.krokiManager).connect("remote-kroki", this.configuration);
+        verify(this.krokiService).connect("remote-kroki", this.configuration);
 
         this.krokiDiagramRenderer.dispose();
         verify(this.containerManager, never()).stopContainer(any(String.class));
@@ -187,7 +187,7 @@ class KrokiDiagramRendererTest
 
         InputStream diagramInputStream = mock(InputStream.class);
 
-        when(this.krokiManager.renderDiagram(same(diagramType), same(outputType), same(diagramContent))).thenReturn(
+        when(this.krokiService.renderDiagram(same(diagramType), same(outputType), same(diagramContent))).thenReturn(
             diagramInputStream);
 
         assertSame(diagramInputStream,

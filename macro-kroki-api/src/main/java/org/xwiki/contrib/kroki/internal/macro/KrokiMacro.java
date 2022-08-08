@@ -113,8 +113,9 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
                 getTemporaryResourceReference(parameters.getDiagramType(), parameters.getOutputType(), content,
                     sourceDocumentReference);
 
-            String temporaryResourceURL =
-                this.urlTemporaryResourceReferenceSerializer.serialize(diagramFileReference).serialize();
+            ExtendedURL temporaryResourceExtendedURL =
+                this.urlTemporaryResourceReferenceSerializer.serialize(diagramFileReference);
+            String temporaryResourceURL = temporaryResourceExtendedURL.serialize();
 
             ResourceReference fileReference = new ResourceReference(temporaryResourceURL, ResourceType.URL);
             ImageBlock img = new ImageBlock(fileReference, true);
