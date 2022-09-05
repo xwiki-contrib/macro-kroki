@@ -81,7 +81,7 @@ import org.xwiki.contrib.kroki.renderer.DiagramRenderer;
 
 @ComponentTest
 @ComponentList({ EventBlockRenderer.class, EventRendererFactory.class, EventRenderer.class })
-public class KrokiMacroTest
+class KrokiMacroTest
 {
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -153,7 +153,7 @@ public class KrokiMacroTest
 
 
     @Test
-    public void executeWithReferenceFromCacheTest()
+    void executeWithReferenceFromCacheTest()
         throws IOException, MacroExecutionException, ComponentLookupException
     {
         when(cacheManager.getResourceFromCache(hash)).thenReturn(resourceReference);
@@ -182,7 +182,7 @@ public class KrokiMacroTest
     }
 
     @Test
-    public void executeWithNewReferenceTest() throws MacroExecutionException, IOException
+    void executeWithNewReferenceTest() throws MacroExecutionException, IOException
     {
         when(cacheManager.getResourceFromCache(any(String.class))).thenReturn(null);
 

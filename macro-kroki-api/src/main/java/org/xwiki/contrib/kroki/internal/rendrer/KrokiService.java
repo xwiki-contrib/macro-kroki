@@ -47,9 +47,8 @@ public class KrokiService
 {
     private static final int CONNECTION_TIMEOUT = 10;
 
-    private static final String HTTP_PROTOCOL = "http://";
-
     private static final String REQUEST_METHOD = "POST";
+
     private static final String URL_PATH_SEPARATOR = "/";
 
     @Inject
@@ -57,19 +56,23 @@ public class KrokiService
 
     private String host;
 
-    private int port;
+    private Integer port;
+
+    private String httpProtocol;
 
     /**
      * Sets up the paramaters to access a service.
      *
      * @param host the host address
      * @param config the configuration of the docker container
+     * @param httpProtocol http or https
      * @throws TimeoutException if the service specified by the container does not respond in a period of time
      */
-    public void connect(String host, KrokiMacroConfiguration config) throws TimeoutException
+    public void connect(String host, KrokiMacroConfiguration config, String httpProtocol) throws TimeoutException
     {
         this.host = host;
         this.port = config.getKrokiPort();
+        this.httpProtocol = httpProtocol + "://";
 
         this.logger.debug("Connecting to the Kroki server on [{}:{}].", host, port);
 
@@ -87,7 +90,8 @@ public class KrokiService
     public InputStream renderDiagram(String diagramType, String outputType, String graphContent)
     {
         try {
-            String path = createRequestPath(HTTP_PROTOCOL, host, String.valueOf(port), diagramType, outputType);
+            String path = createRequestPath(httpProtocol, host, port,
+                URL_PATH_SEPARATOR + diagramType + URL_PATH_SEPARATOR +  outputType);
             HttpURLConnection conn = createRequest(path, REQUEST_METHOD, graphContent);
             return conn.getInputStream();
         } catch (IOException e) {
@@ -97,17 +101,20 @@ public class KrokiService
 
     /**
      * Creates a path for the Kroki request.
+     *
      * @param protocol http protocol
      * @param host host to send the request to
      * @param port request port
-     * @param diagramType the type of diagram
-     * @param outputType the type of file returned by the request
+     * @param path the path to a resource
      * @return the path of the Kroki request
      */
-    public String createRequestPath(String protocol, String host, String port, String diagramType, String outputType)
+    public String createRequestPath(String protocol, String host, Integer port, String path)
     {
-        String path = "";
-        return path + protocol + host + ":" + port + URL_PATH_SEPARATOR + diagramType + URL_PATH_SEPARATOR + outputType;
+        if (port != null) {
+            return String.format("%s%s:%d%s", protocol, host, port, path);
+        } else {
+            return String.format("%s%s%s", protocol, host, port, path);
+        }
     }
 
     private void waitForKrokiService(int timeoutSeconds, HealthCheckRequestParameters healthParams)
@@ -120,7 +127,7 @@ public class KrokiService
 
         while (System.currentTimeMillis() - start < timeoutMillis) {
             try {
-                String url = HTTP_PROTOCOL + host + ':' + port;
+                String url = createRequestPath(httpProtocol, host, port, "");
                 HttpURLConnection con =
                     createRequest(url + healthParams.getPath(), healthParams.getHttpVerb(), healthParams.getBody());
                 int statusCode = con.getResponseCode();
@@ -150,6 +157,10 @@ public class KrokiService
         URL connectionURL = new URL(path);
         HttpURLConnection con = (HttpURLConnection) connectionURL.openConnection();
         con.setRequestMethod(httpVerb);
+        con.setRequestProperty("Accept", "*/*");
+        con.setRequestProperty("User-Agent",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) "
+                + "AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
         if (httpVerb.equals(REQUEST_METHOD) || httpVerb.equals("PUT")) {
             byte[] out = body.getBytes(StandardCharsets.UTF_8);
             con.setFixedLengthStreamingMode(out.length);

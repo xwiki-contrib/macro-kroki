@@ -30,37 +30,37 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ComponentTest
-public class KrokiServiceTest
+class KrokiServiceTest
 {
     private KrokiService krokiService;
 
     @BeforeComponent
-    public void initialize(){
+    void initialize(){
         krokiService = new KrokiService();
     }
 
 
     @Test
     @DisplayName("Test creation of a valid path")
-    public void createRequestPathValidInputTest()
+    void createRequestPathValidInputTest()
     {
-        String actual = krokiService.createRequestPath("http://", "test", "8000", "graphviz", "svg");
+        String actual = krokiService.createRequestPath("http://", "test", 8000, "/graphviz/svg");
         assertEquals("http://test:8000/graphviz/svg", actual);
     }
 
     @Test
     @DisplayName("Test creation of path with null components")
-    public void createRequestPathNullInputTest()
+    void createRequestPathNullInputTest()
     {
-        String actual = krokiService.createRequestPath(null, null, null, null, null);
-        assertEquals("nullnull:null/null/null", actual);
+        String actual = krokiService.createRequestPath(null, null, null, null);
+        assertEquals("nullnullnull", actual);
     }
 
     @Test
     @DisplayName("Test creation of path with empty components")
-    public void createRequestPathEmptyInputTest()
+    void createRequestPathEmptyInputTest()
     {
-        String actual = krokiService.createRequestPath("", "", "", "", "");
-        assertEquals("://", actual);
+        String actual = krokiService.createRequestPath("", "", 0, "");
+        assertEquals(":0", actual);
     }
 }

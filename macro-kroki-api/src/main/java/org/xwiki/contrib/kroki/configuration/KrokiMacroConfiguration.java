@@ -64,7 +64,7 @@ public interface KrokiMacroConfiguration
      * @return the port number used for communicating with the Kroki API running on the host specified by
      *     {@link #getKrokiHost()}; defaults to {@code 8000}
      */
-    int getKrokiPort();
+    Integer getKrokiPort();
 
     /**
      * @return the {@link HealthCheckRequestParameters} to use for testing the service's availability

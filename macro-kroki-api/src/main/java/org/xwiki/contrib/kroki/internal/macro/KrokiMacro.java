@@ -20,7 +20,6 @@
 package org.xwiki.contrib.kroki.internal.macro;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -39,10 +38,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.ImageBlock;
-import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.ResourceReference;
@@ -118,15 +114,9 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
             String temporaryResourceURL = temporaryResourceExtendedURL.serialize();
 
             ResourceReference fileReference = new ResourceReference(temporaryResourceURL, ResourceType.URL);
-            ImageBlock img = new ImageBlock(fileReference, true);
             String fileName = parameters.getDiagramType() + " diagram";
-            img.setParameter("alt", fileName);
-            LinkBlock linkBlock = new LinkBlock(Collections.singletonList(img), fileReference, true);
-            linkBlock.setParameter("title", fileName);
-            linkBlock.setParameter("target", "_blank");
 
-            Block resultBlock;
-            resultBlock = new ParagraphBlock(Collections.singletonList(linkBlock));
+            Block resultBlock = KrokiBlockGenerator.createImageRefBlock(fileReference, fileName);
 
             return Collections.singletonList(resultBlock);
         } catch (IOException | SerializeResourceReferenceException | UnsupportedResourceReferenceException e) {
@@ -154,7 +144,7 @@ public class KrokiMacro extends AbstractMacro<KrokiMacroParameters>
         try {
             contentHash = hashCreator.createMD5Hash(diagramType + outputType + content);
             tempFileReference = cacheManager.getResourceFromCache(contentHash);
-        } catch (NoSuchAlgorithmException ignored) {
+        } catch (Exception ignored) {
         }
 
         if (tempFileReference == null) {

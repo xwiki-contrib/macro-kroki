@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.contrib.kroki.configuration.KrokiMacroConfiguration;
-import org.xwiki.contrib.kroki.internal.configuration.ConfigurationManger;
+import org.xwiki.contrib.kroki.internal.configuration.KrokiConfiguration;
 import org.xwiki.contrib.kroki.internal.docker.ContainerManager;
 import org.xwiki.contrib.kroki.internal.rendrer.KrokiService;
 import org.xwiki.contrib.kroki.internal.rendrer.KrokiDiagramRenderer;
@@ -61,7 +61,7 @@ class KrokiDiagramRendererTest
     private KrokiDiagramRenderer krokiDiagramRenderer;
 
     @MockComponent
-    private ConfigurationManger configurationManager;
+    private KrokiConfiguration configurationManager;
 
     @MockComponent
     private KrokiService krokiService;
@@ -75,6 +75,7 @@ class KrokiDiagramRendererTest
         configuration = mock(KrokiMacroConfiguration.class);
         when(this.configuration.getKrokiDockerContainerName()).thenReturn("test-kroki");
         when(this.configuration.getKrokiDockerImage()).thenReturn("yuzutech/kroki:latest");
+        when(this.configuration.getKrokiHost()).thenReturn("");
         when(this.configuration.getKrokiPort()).thenReturn(8000);
 
         mockNetwork(this.configuration);
@@ -101,7 +102,7 @@ class KrokiDiagramRendererTest
         verify(this.configurationManager).getConfiguration("plantuml");
         verify(this.containerManager).pullImage(this.configuration.getKrokiDockerImage());
         verify(this.containerManager).startContainer(this.containerId);
-        verify(this.krokiService).connect(this.containerIpAddress, this.configuration);
+        verify(this.krokiService).connect(this.containerIpAddress, this.configuration, "http");
 
         this.krokiDiagramRenderer.dispose();
         verify(this.containerManager).stopContainer(this.containerId);
@@ -121,7 +122,7 @@ class KrokiDiagramRendererTest
     {
         verify(this.containerManager, never()).pullImage(any(String.class));
         verify(this.containerManager, never()).startContainer(any(String.class));
-        verify(this.krokiService).connect(this.containerIpAddress, this.configuration);
+        verify(this.krokiService).connect(this.containerIpAddress, this.configuration, "http");
 
         this.krokiDiagramRenderer.dispose();
         verify(this.containerManager).stopContainer(this.containerId);
@@ -139,7 +140,7 @@ class KrokiDiagramRendererTest
         verify(this.containerManager, never()).maybeReuseContainerByName(any(String.class), any(Boolean.class));
         verify(this.containerManager, never()).startContainer(any(String.class));
 
-        verify(this.krokiService).connect("remote-kroki", this.configuration);
+        verify(this.krokiService).connect("remote-kroki", this.configuration, "https");
 
         this.krokiDiagramRenderer.dispose();
         verify(this.containerManager, never()).stopContainer(any(String.class));

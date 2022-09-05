@@ -26,7 +26,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.contrib.kroki.internal.configuration.ConfigurationManger;
+import org.xwiki.contrib.kroki.internal.configuration.KrokiConfiguration;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -40,13 +40,13 @@ import org.xwiki.script.service.ScriptService;
 public class DiagramTypesService implements ScriptService
 {
     @Inject
-    private ConfigurationManger configurationManger;
+    private KrokiConfiguration krokiConfiguration;
 
     /**
      * @return list of diagram types supported that can be generated
      */
     public List<String> diagramTypes()
     {
-        return configurationManger.getDiagramTypes();
+        return krokiConfiguration.getDiagramTypes();
     }
 }

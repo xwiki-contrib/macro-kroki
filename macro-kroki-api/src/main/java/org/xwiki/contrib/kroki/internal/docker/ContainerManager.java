@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -244,13 +243,8 @@ public class ContainerManager implements Initializable
     public String getIpAddress(String containerId)
     {
         Map<String, ContainerNetwork> networks = inspectContainer(containerId).getNetworkSettings().getNetworks();
-        // Try to find the network by name.
-        Optional<ContainerNetwork> optionalNetwork = networks.values().stream().findFirst();
-        if (!optionalNetwork.isPresent()) {
-            throw new NullPointerException();
-        }
 
-        ContainerNetwork network = optionalNetwork.get();
+        ContainerNetwork network = networks.values().stream().findFirst().get();
         return network.getIpAddress();
     }
 

@@ -36,7 +36,7 @@ import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.contrib.kroki.configuration.KrokiMacroConfiguration;
-import org.xwiki.contrib.kroki.internal.configuration.ConfigurationManger;
+import org.xwiki.contrib.kroki.internal.configuration.KrokiConfiguration;
 import org.xwiki.contrib.kroki.internal.docker.ContainerManager;
 import org.xwiki.contrib.kroki.renderer.DiagramRenderer;
 
@@ -59,9 +59,8 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
     @Inject
     private Logger logger;
 
-
     @Inject
-    private ConfigurationManger configurationManger;
+    private KrokiConfiguration krokiConfiguration;
 
     /**
      * We use a provider (i.e. lazy initialization) because we don't always need this component (e.g. when the diagram
@@ -73,7 +72,8 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
     @Override
     public void initialize() throws InitializationException
     {
-        initializeKrokiComponent(configurationManger.getConfiguration("plantuml"));
+        //plantuml is one of the diagram types supported by the default container
+        initializeKrokiComponent(krokiConfiguration.getConfiguration("plantuml"));
     }
 
     @Override
@@ -110,7 +110,7 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
             throw new IllegalArgumentException("The content of the graph is missing");
         }
 
-        KrokiMacroConfiguration diagramConfig = configurationManger.getConfiguration(diagramType);
+        KrokiMacroConfiguration diagramConfig = krokiConfiguration.getConfiguration(diagramType);
         try {
             initializeKrokiComponent(diagramConfig);
         } catch (InitializationException e) {
@@ -119,7 +119,6 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
 
         return krokiService.renderDiagram(diagramType, outputType, diagramContent);
     }
-
 
     private String initializeKrokiDockerContainer(KrokiMacroConfiguration config) throws InitializationException
     {
@@ -153,11 +152,11 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
         }
     }
 
-    private void initializeKrokiService(String host, KrokiMacroConfiguration config)
+    private void initializeKrokiService(String host, KrokiMacroConfiguration config, String httpProtocol)
         throws InitializationException
     {
         try {
-            this.krokiService.connect(host, config);
+            this.krokiService.connect(host, config, httpProtocol);
         } catch (Exception e) {
             throw new InitializationException("Failed to initialize the kroki remote debugging service.", e);
         }
@@ -165,10 +164,15 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
 
     private void initializeKrokiComponent(KrokiMacroConfiguration config) throws InitializationException
     {
+        if (config == null) {
+            throw new RuntimeException("There is no configuration defined for this type of diagram");
+        }
+        String httpProtocol = "https";
         String krokiHost = config.getKrokiHost();
         if (StringUtils.isBlank(krokiHost)) {
+            httpProtocol = "http";
             krokiHost = initializeKrokiDockerContainer(config);
         }
-        initializeKrokiService(krokiHost, config);
+        initializeKrokiService(krokiHost, config, httpProtocol);
     }
 }
