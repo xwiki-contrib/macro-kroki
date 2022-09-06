@@ -44,7 +44,7 @@
         <xwiki.issueManagement.jira.id>XKROKI</xwiki.issueManagement.jira.id>
     </properties>
     <scm>
-        <connection>scm:git:git://github.com/xwiki-contrib/macro-kroki.git</connection>
+        <connection>scm:git:git@github.com:xwiki-contrib/macro-kroki.git</connection>
         <developerConnection>scm:git:git@github.com:xwiki-contrib/macro-kroki.git</developerConnection>
         <url>https://github.com/xwiki-contrib/macro-kroki</url>
         <tag>HEAD</tag>
