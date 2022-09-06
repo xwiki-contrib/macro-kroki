@@ -37,6 +37,7 @@
     <modules>
         <module>macro-kroki-api</module>
         <module>macro-kroki-ui</module>
+        <module>macro-kroki-test</module>
     </modules>
     <properties>
         <xwiki.extension.name>Kroki Diagram Rendering Macro</xwiki.extension.name>

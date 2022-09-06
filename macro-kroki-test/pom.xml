@@ -23,31 +23,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>macro-kroki</artifactId>
     <groupId>org.xwiki.contrib.kroki</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>macro-kroki-ui</artifactId>
-  <name>Kroki Macro UI</name>
-  <description>
-    Contains XWiki Pages for the configuration of the Kroki macro which generates diagrams
-    based on a textual description.
-  </description>
-  <packaging>xar</packaging>
+  <artifactId>macro-kroki-test</artifactId>
+  <name>Kroki Macro - Test - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>Functional Test for Kroki Macro</description>
 
   <properties>
-    <xwiki.extension.name>Kroki Diagram Rendering Macro</xwiki.extension.name>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>macro-kroki-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <modules>
+  </modules>
+  <profiles>
+  </profiles>
 
 </project>
