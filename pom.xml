@@ -54,12 +54,4 @@
             <name>Apostu Daniel</name>
         </developer>
     </developers>
-    <profiles>
-        <profile>
-            <id>integration-tests</id>
-            <modules>
-                <module>macro-kroki-test</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>
