@@ -29,7 +29,7 @@
     </parent>
     <groupId>org.xwiki.contrib.kroki</groupId>
     <artifactId>macro-kroki</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <name>Kroki Macro</name>
     <description>Macro integrating Kroki diagram drawing service into XWiki</description>
     <packaging>pom</packaging>
@@ -45,7 +45,7 @@
         <connection>scm:git:git@github.com:xwiki-contrib/macro-kroki.git</connection>
         <developerConnection>scm:git:git@github.com:xwiki-contrib/macro-kroki.git</developerConnection>
         <url>https://github.com/xwiki-contrib/macro-kroki</url>
-        <tag>macro-kroki-1.0</tag>
+        <tag>HEAD</tag>
     </scm>
     <developers>
         <developer>
