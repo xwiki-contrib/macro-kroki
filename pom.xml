@@ -37,7 +37,6 @@
     <modules>
         <module>macro-kroki-api</module>
         <module>macro-kroki-ui</module>
-        <module>macro-kroki-test</module>
     </modules>
     <properties>
         <xwiki.extension.name>Kroki Diagram Rendering Macro</xwiki.extension.name>
@@ -55,4 +54,26 @@
             <name>Apostu Daniel</name>
         </developer>
     </developers>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>integration-tests</id>
+            <modules>
+                <module>macro-kroki-test</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
