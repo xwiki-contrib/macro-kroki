@@ -1,9 +1,9 @@
 # Kroki Macro
 
-Creates diagrams through the Kroki API which unifies several diagram generation libraries.
+Create diagrams through the Kroki API which unifies several diagram generation libraries.
 
 * Project Lead: [Apostu Daniel](https://www.xwiki.org/xwiki/bin/view/XWiki/dapostu)
-* Documentation & Download : https://extensions.xwiki.org/xwiki/bin/view/Extension/Kroki%20Diagram%20Rendering%20Macro/
+* [Documentation & Download](https://extensions.xwiki.org/xwiki/bin/view/Extension/Kroki%20Diagram%20Rendering%20Macro/)
 * [Issue Tracker](https://jira.xwiki.org/projects/XKROKI)
 * Communication: [Mailing List](http://dev.xwiki.org/xwiki/bin/view/Community/MailingLists)
   , [IRC](http://dev.xwiki.org/xwiki/bin/view/Community/IRC)
