@@ -41,7 +41,7 @@
       org.xwiki.rendering.macro.Macro/kroki
     </xwiki.extension.components>
     <xwiki.issueManagement.jira.id>XKROKI</xwiki.issueManagement.jira.id>
-    <xwiki.extension.category>Macro</xwiki.extension.category>
+    <xwiki.extension.category>macro</xwiki.extension.category>
   </properties>
 
   <developers>
