@@ -31,14 +31,29 @@
   <artifactId>macro-kroki-ui</artifactId>
   <name>Kroki Macro UI</name>
   <description>
-    Contains XWiki Pages for the configuration of the Kroki macro which generates diagrams
-    based on a textual description.
+    Generates diagrams based on a textual description.
   </description>
   <packaging>xar</packaging>
 
   <properties>
     <xwiki.extension.name>Kroki Diagram Rendering Macro</xwiki.extension.name>
+    <xwiki.extension.components>
+      org.xwiki.rendering.macro.Macro/kroki
+    </xwiki.extension.components>
+    <xwiki.issueManagement.jira.id>XKROKI</xwiki.issueManagement.jira.id>
+    <xwiki.extension.category>Macro</xwiki.extension.category>
   </properties>
+
+  <developers>
+    <developer>
+      <id>dapostu</id>
+      <name>Apostu Daniel</name>
+    </developer>
+    <developer>
+      <id>mflorea</id>
+      <name>Marius Dumitru Florea</name>
+    </developer>
+  </developers>
 
   <dependencies>
     <dependency>
