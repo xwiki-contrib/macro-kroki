@@ -11,5 +11,5 @@ Create diagrams through the Kroki API which unifies several diagram generation l
 * Minimal XWiki version supported: 13.10
 * License: LGPL 2.1
 * Translations: N/A
-* Sonar Dashboard: N/A
+* [Sonar Dashboard](https://sonarcloud.io/project/overview?id=org.xwiki.contrib.kroki%3Amacro-kroki)
 * Continuous Integration Status: [![Build Status](https://ci.xwiki.org/job/XWiki%20Contrib/job/macro-kroki/job/master/badge/icon)](https://ci.xwiki.org/job/XWiki%20Contrib/job/macro-kroki/job/master/)
