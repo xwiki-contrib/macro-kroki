@@ -44,17 +44,6 @@
     <xwiki.extension.category>macro</xwiki.extension.category>
   </properties>
 
-  <developers>
-    <developer>
-      <id>dapostu</id>
-      <name>Apostu Daniel</name>
-    </developer>
-    <developer>
-      <id>mflorea</id>
-      <name>Marius Dumitru Florea</name>
-    </developer>
-  </developers>
-
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

@@ -52,5 +52,9 @@
             <id>dapostu</id>
             <name>Apostu Daniel</name>
         </developer>
+        <developer>
+            <id>mflorea</id>
+            <name>Marius Dumitru Florea</name>
+        </developer>
     </developers>
 </project>
