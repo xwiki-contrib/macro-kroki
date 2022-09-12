@@ -31,7 +31,7 @@
   <artifactId>macro-kroki-ui</artifactId>
   <name>Kroki Macro UI</name>
   <description>
-    Generates diagrams based on a textual description.
+    Create diagrams through the Kroki API which unifies several diagram generation libraries.
   </description>
   <packaging>xar</packaging>
 
