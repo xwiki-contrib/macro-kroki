@@ -36,7 +36,7 @@
   <packaging>xar</packaging>
 
   <properties>
-    <xwiki.extension.name>Kroki Diagram Rendering Macro</xwiki.extension.name>
+    <xwiki.extension.name>Kroki Macro</xwiki.extension.name>
     <xwiki.extension.components>
       org.xwiki.rendering.macro.Macro/kroki
     </xwiki.extension.components>

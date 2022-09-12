@@ -38,7 +38,7 @@
         <module>macro-kroki-ui</module>
     </modules>
     <properties>
-        <xwiki.extension.name>Kroki Diagram Rendering Macro</xwiki.extension.name>
+        <xwiki.extension.name>Kroki Macro</xwiki.extension.name>
         <xwiki.issueManagement.jira.id>XKROKI</xwiki.issueManagement.jira.id>
     </properties>
     <scm>
