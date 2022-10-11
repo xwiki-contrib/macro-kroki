@@ -2,6 +2,7 @@
   "image": "yuzutech/kroki-mermaid",
   "containerName": "kroki-mermaid-container",
   "isContainerReusable": true,
+  "useTls": false,
   "host": "",
   "port": 8002,
   "healthCheckRequestParameters":

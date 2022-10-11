@@ -41,12 +41,6 @@
         <xwiki.extension.name>Kroki Diagram Rendering Macro</xwiki.extension.name>
         <xwiki.issueManagement.jira.id>XKROKI</xwiki.issueManagement.jira.id>
     </properties>
-    <scm>
-        <connection>scm:git:git@github.com:xwiki-contrib/macro-kroki.git</connection>
-        <developerConnection>scm:git:git@github.com:xwiki-contrib/macro-kroki.git</developerConnection>
-        <url>https://github.com/xwiki-contrib/macro-kroki</url>
-        <tag>macro-kroki-1.0</tag>
-    </scm>
     <developers>
         <developer>
             <id>dapostu</id>

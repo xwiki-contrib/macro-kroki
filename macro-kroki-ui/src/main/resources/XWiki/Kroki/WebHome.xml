@@ -63,7 +63,7 @@
   #end
 #end
 
-= Create a new configuration =
+= Create a new configuration ok =
 
 #if("$!targetDocName" != '' &amp;&amp; $xwiki.exists($targetDocName))
   {{warning}}The target document already exists. Please choose a different name, or [[view the existing document&gt;&gt;$targetDocName]]{{/warning}}

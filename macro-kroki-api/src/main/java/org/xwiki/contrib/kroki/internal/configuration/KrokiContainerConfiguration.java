@@ -39,6 +39,8 @@ public class KrokiContainerConfiguration implements KrokiMacroConfiguration
 
     private final boolean isContainerReusable;
 
+    private final boolean useTls;
+
     private final String host;
 
     private final Integer port;
@@ -56,19 +58,21 @@ public class KrokiContainerConfiguration implements KrokiMacroConfiguration
      * @param containerName docker container name
      * @param isContainerReusable false if a new docker container should be instantiated \ even if one with the same
      *     name exists
+     * @param useTls true to use TLS to contact the specified host
      * @param host address to be called for the Kroki service
      * @param port port to be called for the Kroki service
      * @param healthCheckRequestParameters request parameters used to chekc if the Kroki service is online
      * @param configurationSource used to overwrite properties from xwiki.properties file
      */
-    public KrokiContainerConfiguration(String image, String containerName, boolean isContainerReusable, String host,
-        Integer port, HealthCheckRequestParameters healthCheckRequestParameters,
+    public KrokiContainerConfiguration(String image, String containerName, boolean isContainerReusable,
+        boolean useTls, String host, Integer port, HealthCheckRequestParameters healthCheckRequestParameters,
         ConfigurationSource configurationSource)
     {
         this.configName = containerName;
         this.image = image;
         this.containerName = containerName;
         this.isContainerReusable = isContainerReusable;
+        this.useTls = useTls;
         this.host = host;
         this.port = port;
         this.healthCheckRequestParameters = healthCheckRequestParameters;
@@ -101,6 +105,12 @@ public class KrokiContainerConfiguration implements KrokiMacroConfiguration
     {
         return this.configurationSource.getProperty(PREFIX + configName + "DockerContainerReusable",
             isContainerReusable);
+    }
+
+    @Override
+    public boolean getKrokiUseTls()
+    {
+        return this.configurationSource.getProperty(PREFIX + configName + "UseTls", useTls);
     }
 
     @Override

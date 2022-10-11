@@ -78,6 +78,8 @@ public class KrokiConfiguration implements Initializable
 
     private static final String IS_CONTAINER_REUSABLE_PROP = "isContainerReusable";
 
+    private static final String USE_TLS_PROP = "useTls";
+
     private static final String HOST_PROP = "host";
 
     private static final String PORT_PROP = "port";
@@ -263,6 +265,7 @@ public class KrokiConfiguration implements Initializable
         String image = (String) configurationParameters.get("image");
         String containerName = (String) configurationParameters.get(CONTAINER_NAME_PROP);
         boolean isContainerReusable = (boolean) configurationParameters.get(IS_CONTAINER_REUSABLE_PROP);
+        boolean useTls = (boolean) configurationParameters.get(USE_TLS_PROP);
         String host = (String) configurationParameters.get(HOST_PROP);
         Integer port =
             configurationParameters.get(PORT_PROP).equals("") ? null : (int) configurationParameters.get(PORT_PROP);
@@ -274,7 +277,7 @@ public class KrokiConfiguration implements Initializable
                 (List<Integer>) healthCheckParameters.get("acceptedStatusCodes"));
 
         KrokiContainerConfiguration configuration =
-            new KrokiContainerConfiguration(image, containerName, isContainerReusable, host, port,
+            new KrokiContainerConfiguration(image, containerName, isContainerReusable, useTls, host, port,
                 healthCheckRequestParameters, configurationSource);
         configuration.setConfigName(fileName);
         fileToConfigurationMap.put(fileName, configuration);
@@ -291,6 +294,7 @@ public class KrokiConfiguration implements Initializable
             String dockerImage = object.getStringValue("dockerImage");
             String containerName = object.getStringValue(CONTAINER_NAME_PROP);
             boolean isContainerReusable = object.getIntValue(IS_CONTAINER_REUSABLE_PROP) == 1;
+            boolean useTls = object.getIntValue(USE_TLS_PROP) == 1;
             String host = object.getStringValue(HOST_PROP);
             long configurationPort = object.getLongValue(PORT_PROP);
             List<String> healthCheckAcceptedStatusCodes = object.getListValue("healthCheckAcceptedStatusCodes");
@@ -323,8 +327,8 @@ public class KrokiConfiguration implements Initializable
             Integer port = configurationPort == 0 ? null : (int) configurationPort;
 
             KrokiContainerConfiguration configuration =
-                new KrokiContainerConfiguration(dockerImage, containerName, isContainerReusable, host, port,
-                    healthCheckRequestParameters, configurationSource);
+                new KrokiContainerConfiguration(dockerImage, containerName, isContainerReusable, useTls, host,
+                    port, healthCheckRequestParameters, configurationSource);
             configuration.setConfigName(configName);
 
             for (String diagramType : parsedDiagramTypes) {

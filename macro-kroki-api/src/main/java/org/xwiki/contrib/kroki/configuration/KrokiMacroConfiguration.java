@@ -52,6 +52,11 @@ public interface KrokiMacroConfiguration
     boolean isKrokiDockerContainerReusable();
 
     /**
+     * @return {@code true} to use TLS if a host is specified by {@link #getKrokiHost()}
+     */
+    boolean getKrokiUseTls();
+
+    /**
      * @return the host running the Kroki API, specified either by its name or by its IP address; this allows you to use
      *     a remote API instance, running on a separate machine, rather than a API instance running in a Docker
      *     container on the same machine; defaults to empty value, meaning that by default the graph generation is done
