@@ -20,35 +20,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>macro-kroki</artifactId>
     <groupId>org.xwiki.contrib.kroki</groupId>
     <version>1.1-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>macro-kroki-ui</artifactId>
-  <name>Kroki Macro UI</name>
-  <description>
-    Create diagrams through the Kroki API which unifies several diagram generation libraries.
-  </description>
-  <packaging>xar</packaging>
-
-  <properties>
-    <xwiki.extension.name>Kroki Macro</xwiki.extension.name>
-    <xwiki.extension.components>
-      org.xwiki.rendering.macro.Macro/kroki
-    </xwiki.extension.components>
-    <xwiki.issueManagement.jira.id>XKROKI</xwiki.issueManagement.jira.id>
-    <xwiki.extension.category>macro</xwiki.extension.category>
-  </properties>
+  <artifactId>macro-kroki-test-pageobjects</artifactId>
+  <name>Kroki Macro - Test - Page Objects</name>
+  <description>Page Objects for Kroki Macro</description>
+  <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>macro-kroki-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test-ui</artifactId>
+      <version>${platform.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-test-pageobjects</artifactId>
+      <version>${platform.version}</version>
     </dependency>
   </dependencies>
 

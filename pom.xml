@@ -29,7 +29,7 @@
     </parent>
     <groupId>org.xwiki.contrib.kroki</groupId>
     <artifactId>macro-kroki</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <name>Kroki Macro</name>
     <description>Macro integrating Kroki diagram drawing service into XWiki</description>
     <packaging>pom</packaging>
@@ -38,13 +38,31 @@
         <module>macro-kroki-ui</module>
     </modules>
     <properties>
-        <xwiki.extension.name>Kroki Diagram Rendering Macro</xwiki.extension.name>
+        <xwiki.extension.name>Kroki Macro</xwiki.extension.name>
         <xwiki.issueManagement.jira.id>XKROKI</xwiki.issueManagement.jira.id>
     </properties>
+    <scm>
+        <connection>scm:git:git@github.com:xwiki-contrib/macro-kroki.git</connection>
+        <developerConnection>scm:git:git@github.com:xwiki-contrib/macro-kroki.git</developerConnection>
+        <url>https://github.com/xwiki-contrib/macro-kroki</url>
+        <tag>HEAD</tag>
+    </scm>
     <developers>
         <developer>
             <id>dapostu</id>
             <name>Apostu Daniel</name>
         </developer>
+        <developer>
+            <id>mflorea</id>
+            <name>Marius Dumitru Florea</name>
+        </developer>
     </developers>
+    <profiles>
+        <profile>
+            <id>integration-tests</id>
+            <modules>
+                <module>macro-kroki-test</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

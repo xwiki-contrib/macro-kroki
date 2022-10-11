@@ -63,7 +63,7 @@
   #end
 #end
 
-= Create a new configuration ok =
+= Create a new configuration =
 
 #if("$!targetDocName" != '' &amp;&amp; $xwiki.exists($targetDocName))
   {{warning}}The target document already exists. Please choose a different name, or [[view the existing document&gt;&gt;$targetDocName]]{{/warning}}
@@ -79,7 +79,9 @@
       &lt;input type="hidden" name="sheet" value="1"/&gt;
       &lt;input type="hidden" name="spaceName" value="XWiki.Kroki"/&gt;
       Document: &lt;input type="text" name="docName" value="Enter the new configurations name" class="withTip" size="50"/&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Create this Configuration" class="button"/&gt;&lt;/span&gt;
+      &lt;span class="buttonwrapper"&gt;&lt;input name="createConfigBtn" type="submit" value="Create this
+    Configuration"
+    class="button"/&gt;&lt;/span&gt;
     &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}

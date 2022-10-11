@@ -20,36 +20,37 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>macro-kroki</artifactId>
     <groupId>org.xwiki.contrib.kroki</groupId>
     <version>1.1-SNAPSHOT</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>macro-kroki-ui</artifactId>
-  <name>Kroki Macro UI</name>
-  <description>
-    Create diagrams through the Kroki API which unifies several diagram generation libraries.
-  </description>
-  <packaging>xar</packaging>
+  <artifactId>macro-kroki-test</artifactId>
+  <name>Kroki Macro - Test - Parent POM</name>
+  <packaging>pom</packaging>
+  <description>Functional Test for Kroki Macro</description>
 
   <properties>
-    <xwiki.extension.name>Kroki Macro</xwiki.extension.name>
-    <xwiki.extension.components>
-      org.xwiki.rendering.macro.Macro/kroki
-    </xwiki.extension.components>
-    <xwiki.issueManagement.jira.id>XKROKI</xwiki.issueManagement.jira.id>
-    <xwiki.extension.category>macro</xwiki.extension.category>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>macro-kroki-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>macro-kroki-test-pageobjects</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>macro-kroki-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>
