@@ -54,7 +54,7 @@ public interface KrokiMacroConfiguration
     /**
      * @return {@code true} to use TLS if a host is specified by {@link #getKrokiHost()}
      */
-    boolean getKrokiUseTls();
+    boolean getKrokiUseTLS();
 
     /**
      * @return the host running the Kroki API, specified either by its name or by its IP address; this allows you to use
