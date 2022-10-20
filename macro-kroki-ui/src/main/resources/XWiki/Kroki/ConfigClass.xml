@@ -202,7 +202,7 @@
       <displayFormType>select</displayFormType>
       <displayType/>
       <hint/>
-      <name>useTls</name>
+      <name>useTLS</name>
       <number>6</number>
       <prettyName>Use TLS</prettyName>
       <unmodifiable>0</unmodifiable>
