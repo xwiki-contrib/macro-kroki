@@ -194,21 +194,21 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </host>
-      <useTls>
+      <useTLS>
         <customDisplay/>
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>select</displayFormType>
         <displayType/>
         <hint/>
-        <name>useTls</name>
+        <name>useTLS</name>
         <number>6</number>
         <prettyName>Use TLS</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </useTls>
+      </useTLS>
       <isContainerReusable>
         <customDisplay/>
         <defaultValue/>
@@ -267,7 +267,7 @@
       <host/>
     </property>
     <property>
-      <httpProtocol/>
+      <useTLS/>
     </property>
     <property>
       <isContainerReusable/>

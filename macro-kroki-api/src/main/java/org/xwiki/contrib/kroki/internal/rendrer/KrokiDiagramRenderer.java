@@ -170,7 +170,7 @@ public class KrokiDiagramRenderer implements DiagramRenderer, Initializable, Dis
         if (config == null) {
             throw new RuntimeException("There is no configuration defined for this type of diagram");
         }
-        String httpProtocol = config.getKrokiUseTls() ? TLS : NO_TLS;
+        String httpProtocol = config.getKrokiUseTLS() ? TLS : NO_TLS;
         String krokiHost = config.getKrokiHost();
         if (StringUtils.isBlank(krokiHost)) {
             httpProtocol = NO_TLS;

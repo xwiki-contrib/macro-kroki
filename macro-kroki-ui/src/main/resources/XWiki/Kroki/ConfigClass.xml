@@ -195,7 +195,7 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </host>
-    <useTls>
+    <useTLS>
       <customDisplay/>
       <defaultValue/>
       <disabled>0</disabled>
@@ -209,7 +209,7 @@
       <validationMessage/>
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-    </useTls>
+    </useTLS>
     <isContainerReusable>
       <customDisplay/>
       <defaultValue/>

@@ -2,7 +2,7 @@
   "image": "yuzutech/kroki-bpmn",
   "containerName": "kroki-bpmn-container",
   "isContainerReusable": true,
-  "useTls": false,
+  "useTLS": false,
   "host": "",
   "port": 8003,
   "healthCheckRequestParameters": {
