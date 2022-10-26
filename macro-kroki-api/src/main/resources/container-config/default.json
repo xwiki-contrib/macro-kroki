@@ -2,6 +2,7 @@
   "image": "yuzutech/kroki",
   "containerName": "kroki-diagram-generator",
   "isContainerReusable": false,
+  "useTLS": false,
   "host": "",
   "port": 8000,
   "healthCheckRequestParameters":

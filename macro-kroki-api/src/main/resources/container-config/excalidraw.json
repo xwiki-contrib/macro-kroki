@@ -2,6 +2,7 @@
   "image": "yuzutech/kroki-excalidraw",
   "containerName": "kroki-excalidraw-container",
   "isContainerReusable": true,
+  "useTLS": false,
   "host": "",
   "port": 8004,
   "healthCheckRequestParameters": {

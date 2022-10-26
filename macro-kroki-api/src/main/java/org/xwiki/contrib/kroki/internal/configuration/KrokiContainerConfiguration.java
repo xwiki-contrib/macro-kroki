@@ -29,7 +29,7 @@ import org.xwiki.contrib.kroki.utils.HealthCheckRequestParameters;
  *
  * @version $Id$
  */
-public class KrokiContainerConfiguration implements KrokiMacroConfiguration
+public final class KrokiContainerConfiguration implements KrokiMacroConfiguration
 {
     private static final String PREFIX = "contrib.krokiMacro";
 
@@ -38,6 +38,8 @@ public class KrokiContainerConfiguration implements KrokiMacroConfiguration
     private final String containerName;
 
     private final boolean isContainerReusable;
+
+    private final boolean useTLS;
 
     private final String host;
 
@@ -49,30 +51,17 @@ public class KrokiContainerConfiguration implements KrokiMacroConfiguration
 
     private String configName;
 
-    /**
-     * Constructor for initiating configuration parameters.
-     *
-     * @param image docker image to be instantiated if no host available
-     * @param containerName docker container name
-     * @param isContainerReusable false if a new docker container should be instantiated \ even if one with the same
-     *     name exists
-     * @param host address to be called for the Kroki service
-     * @param port port to be called for the Kroki service
-     * @param healthCheckRequestParameters request parameters used to chekc if the Kroki service is online
-     * @param configurationSource used to overwrite properties from xwiki.properties file
-     */
-    public KrokiContainerConfiguration(String image, String containerName, boolean isContainerReusable, String host,
-        Integer port, HealthCheckRequestParameters healthCheckRequestParameters,
-        ConfigurationSource configurationSource)
+    private KrokiContainerConfiguration(Builder builder)
     {
-        this.configName = containerName;
-        this.image = image;
-        this.containerName = containerName;
-        this.isContainerReusable = isContainerReusable;
-        this.host = host;
-        this.port = port;
-        this.healthCheckRequestParameters = healthCheckRequestParameters;
-        this.configurationSource = configurationSource;
+        this.configName = builder.containerName;
+        this.image = builder.image;
+        this.containerName = builder.containerName;
+        this.isContainerReusable = builder.isContainerReusable;
+        this.useTLS = builder.useTLS;
+        this.host = builder.host;
+        this.port = builder.port;
+        this.healthCheckRequestParameters = builder.healthCheckRequestParameters;
+        this.configurationSource = builder.configurationSource;
     }
 
     /**
@@ -104,6 +93,12 @@ public class KrokiContainerConfiguration implements KrokiMacroConfiguration
     }
 
     @Override
+    public boolean getKrokiUseTLS()
+    {
+        return this.configurationSource.getProperty(PREFIX + configName + "UseTLS", useTLS);
+    }
+
+    @Override
     public String getKrokiHost()
     {
         return this.configurationSource.getProperty(PREFIX + configName + "Host", host);
@@ -119,5 +114,128 @@ public class KrokiContainerConfiguration implements KrokiMacroConfiguration
     public HealthCheckRequestParameters getHealthCheckRequest()
     {
         return healthCheckRequestParameters;
+    }
+
+
+    /**
+     * Generic Macro Configuration class builder.
+     *
+     * @version $Id$
+     */
+    public static class Builder
+    {
+        private String image;
+        private String containerName;
+        private boolean isContainerReusable;
+        private boolean useTLS;
+        private String host;
+        private Integer port;
+        private HealthCheckRequestParameters healthCheckRequestParameters;
+        private ConfigurationSource configurationSource;
+
+        /**
+         * Instantiate an empty builder.
+         */
+        public Builder()
+        {
+        }
+
+        /**
+         * Set the docker image to be instantiated if no host available.
+         * @param image docker image
+         * @return Builder instance
+         */
+        public Builder setImage(String image)
+        {
+            this.image = image;
+            return this;
+        }
+
+        /**
+         * Set the name of the docker container.
+         * @param containerName name of the container
+         * @return Builder instance
+         */
+        public Builder setContainerName(String containerName)
+        {
+            this.containerName = containerName;
+            return this;
+        }
+
+        /**
+         * Set the value indicating if the docker container is reusable.
+         * @param isContainerReusable false if a new docker container should be instantiated \ even if one with the same
+     *     name exists
+         * @return Builder instance
+         */
+        public Builder setContainerReusable(boolean isContainerReusable)
+        {
+            this.isContainerReusable = isContainerReusable;
+            return this;
+        }
+
+        /**
+         * Set the value indicating whether the host (if specified) should be contacted through TLS.
+         * @param useTLS true to use TLS
+         * @return Builder instance
+         */
+        public Builder setTLS(boolean useTLS)
+        {
+            this.useTLS = useTLS;
+            return this;
+        }
+
+        /**
+         * Set the the host to address of the Kroki instance.
+         * @param host the host of the Kroki instance
+         * @return Builder instance
+         */
+        public Builder setHost(String host)
+        {
+            this.host = host;
+            return this;
+        }
+
+        /**
+         * Set the port of the Kroki instance.
+         * @param port the port of the Kroki instance
+         * @return Builder instance
+         */
+        public Builder setPort(Integer port)
+        {
+            this.port = port;
+            return this;
+        }
+
+        /**
+         * Set the request parameters used to check if the Kroki service is online.
+         * @param healthCheckRequestParameters parameters used to check if the Kroki service is online
+         * @return Builder instance
+         */
+        public Builder setHealthCheckRequestParameters(HealthCheckRequestParameters healthCheckRequestParameters)
+        {
+            this.healthCheckRequestParameters = healthCheckRequestParameters;
+            return this;
+        }
+
+        /**
+         * Set the source used to overwrite properties from xwiki.properties file.
+         * @param configurationSource the configuration source
+         * @return Builder instance
+         */
+        public Builder setConfigurationSource(ConfigurationSource configurationSource)
+        {
+            this.configurationSource = configurationSource;
+            return this;
+        }
+
+        /**
+         * Builds the class and returns the result.
+         * @return built KrokiContainerConfiguration
+         */
+        public KrokiContainerConfiguration build()
+        {
+            return new KrokiContainerConfiguration(this);
+        }
     }
 }

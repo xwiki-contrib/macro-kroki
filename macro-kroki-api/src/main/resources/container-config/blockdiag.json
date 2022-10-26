@@ -2,6 +2,7 @@
   "image": "yuzutech/kroki-blockdiag",
   "containerName": "kroki-blockdiag-container",
   "isContainerReusable": true,
+  "useTLS": false,
   "host": "",
   "port": 8001,
   "healthCheckRequestParameters":
