@@ -1,5 +1,5 @@
 {
-  "image": "yuzutech/kroki",
+  "image": "yuzutech/kroki:latest",
   "containerName": "kroki-diagram-generator",
   "isContainerReusable": false,
   "useTLS": false,

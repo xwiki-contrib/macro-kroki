@@ -1,5 +1,5 @@
 {
-  "image": "yuzutech/kroki-excalidraw",
+  "image": "yuzutech/kroki-excalidraw:latest",
   "containerName": "kroki-excalidraw-container",
   "isContainerReusable": true,
   "useTLS": false,

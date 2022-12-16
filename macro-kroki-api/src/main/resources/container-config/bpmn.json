@@ -1,5 +1,5 @@
 {
-  "image": "yuzutech/kroki-bpmn",
+  "image": "yuzutech/kroki-bpmn:latest",
   "containerName": "kroki-bpmn-container",
   "isContainerReusable": true,
   "useTLS": false,
