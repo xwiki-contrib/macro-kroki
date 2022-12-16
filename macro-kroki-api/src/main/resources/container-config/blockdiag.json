@@ -1,5 +1,5 @@
 {
-  "image": "yuzutech/kroki-blockdiag",
+  "image": "yuzutech/kroki-blockdiag:latest",
   "containerName": "kroki-blockdiag-container",
   "isContainerReusable": true,
   "useTLS": false,

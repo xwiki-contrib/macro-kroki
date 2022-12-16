@@ -1,5 +1,5 @@
 {
-  "image": "yuzutech/kroki-mermaid",
+  "image": "yuzutech/kroki-mermaid:latest",
   "containerName": "kroki-mermaid-container",
   "isContainerReusable": true,
   "useTLS": false,
