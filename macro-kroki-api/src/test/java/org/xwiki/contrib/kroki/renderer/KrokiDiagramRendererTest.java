@@ -132,6 +132,7 @@ class KrokiDiagramRendererTest
     void beforeInitializeWithRemoteKroki()
     {
         when(this.configuration.getKrokiHost()).thenReturn("remote-kroki");
+        when(this.configuration.getKrokiUseTLS()).thenReturn(true);
     }
 
     @Test

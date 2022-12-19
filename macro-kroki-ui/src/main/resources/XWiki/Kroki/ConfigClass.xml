@@ -81,10 +81,10 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </containerName>
     <diagramTypes>
-      <contenttype>---</contenttype>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>PureText</editor>
       <hint>List of values separated by ", " containing the diagram types for which this container is responsible</hint>
       <name>diagramTypes</name>
       <number>2</number>
@@ -137,10 +137,10 @@
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </healthCheckAcceptedStatusCodes>
     <healthCheckBody>
-      <contenttype>---</contenttype>
+      <contenttype>PureText</contenttype>
       <customDisplay/>
       <disabled>0</disabled>
-      <editor>---</editor>
+      <editor>PureText</editor>
       <hint>The body of the health check request</hint>
       <name>healthCheckBody</name>
       <number>10</number>
@@ -195,21 +195,6 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </host>
-    <useTLS>
-      <customDisplay/>
-      <defaultValue/>
-      <disabled>0</disabled>
-      <displayFormType>select</displayFormType>
-      <displayType/>
-      <hint/>
-      <name>useTLS</name>
-      <number>6</number>
-      <prettyName>Use TLS</prettyName>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-    </useTLS>
     <isContainerReusable>
       <customDisplay/>
       <defaultValue/>
@@ -239,6 +224,21 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
     </port>
+    <useTLS>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>useTLS</name>
+      <number>6</number>
+      <prettyName>Use TLS</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </useTLS>
   </class>
   <object>
     <name>XWiki.Kroki.ConfigClass</name>

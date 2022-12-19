@@ -19,11 +19,11 @@
  */
 package org.xwiki.contrib.kroki.test.po;
 
+import java.util.List;
 import java.util.Set;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.InlinePage;
 
 /**
@@ -33,46 +33,12 @@ import org.xwiki.test.ui.po.InlinePage;
  */
 public class KrokiConfigurationEntryEditPage extends InlinePage
 {
-    @FindBy(id = "XWiki.Kroki.ConfigClass_0_configurationName")
-    private WebElement configurationNameElement;
-
-    @FindBy(id = "XWiki.Kroki.ConfigClass_0_diagramTypes")
-    private WebElement diagramTypesElement;
-
-    @FindBy(id = "XWiki.Kroki.ConfigClass_0_dockerImage")
-    private WebElement dockerImageElement;
-
-    @FindBy(id = "XWiki.Kroki.ConfigClass_0_containerName")
-    private WebElement containerNameElement;
-
-    @FindBy(id = "XWiki.Kroki.ConfigClass_0_isContainerReusable")
-    private WebElement isContainerReusableElement;
-
-    @FindBy(id = "XWiki.Kroki.ConfigClass_0_host")
-    private WebElement hostElement;
-
-    @FindBy(id = "XWiki.Kroki.ConfigClass_0_port")
-    private WebElement portElement;
-
-    @FindBy(id = "XWiki.Kroki.ConfigClass_0_healthCheckPath")
-    private WebElement healthPathElement;
-
-    @FindBy(id = "XWiki.Kroki.ConfigClass_0_healthCheckBody")
-    private WebElement healthBodyElement;
-
-    @FindBy(id = "XWiki.Kroki.ConfigClass_0_healthCheckHTTPVerb")
-    private WebElement healthVerbElement;
-
-    @FindBy(id = "XWiki.Kroki.ConfigClass_0_configurationName")
-    private WebElement healthStatusCodesElement;
-
     /**
      * @param configurationName the name of the configuration
      */
     public void setConfigurationName(String configurationName)
     {
-        this.configurationNameElement.clear();
-        this.configurationNameElement.sendKeys(configurationName);
+        setValue("configurationName", configurationName);
     }
 
     /**
@@ -80,8 +46,7 @@ public class KrokiConfigurationEntryEditPage extends InlinePage
      */
     public void setDiagramTypes(String diagramTypes)
     {
-        this.diagramTypesElement.clear();
-        this.diagramTypesElement.sendKeys(diagramTypes);
+        setValue("diagramTypes", diagramTypes);
     }
 
     /**
@@ -89,8 +54,7 @@ public class KrokiConfigurationEntryEditPage extends InlinePage
      */
     public void setDockerImage(String dockerImage)
     {
-        this.dockerImageElement.clear();
-        this.dockerImageElement.sendKeys(dockerImage);
+        setValue("dockerImage", dockerImage);
     }
 
     /**
@@ -98,8 +62,7 @@ public class KrokiConfigurationEntryEditPage extends InlinePage
      */
     public void setContainerName(String containerName)
     {
-        this.containerNameElement.clear();
-        this.containerNameElement.sendKeys(containerName);
+        setValue("containerName", containerName);
     }
 
     /**
@@ -107,12 +70,15 @@ public class KrokiConfigurationEntryEditPage extends InlinePage
      */
     public void setIsContainerReusable(boolean isContainerReusable)
     {
-        isContainerReusableElement.click();
-        if (isContainerReusable) {
-            isContainerReusableElement.findElement(By.xpath("//option[@label='Yes']"));
-        } else {
-            isContainerReusableElement.findElement(By.xpath("//option[@label='No']"));
-        }
+        setValue("isContainerReusable", isContainerReusable ? "1" : "0");
+    }
+
+    /**
+     * @param useTLS whether to use a secure connection or not
+     */
+    public void setUseTLS(boolean useTLS)
+    {
+        setValue("useTLS", useTLS ? "1" : "0");
     }
 
     /**
@@ -120,8 +86,7 @@ public class KrokiConfigurationEntryEditPage extends InlinePage
      */
     public void setHost(String host)
     {
-        this.hostElement.clear();
-        this.hostElement.sendKeys(host);
+        setValue("host", host);
     }
 
     /**
@@ -129,8 +94,7 @@ public class KrokiConfigurationEntryEditPage extends InlinePage
      */
     public void setPort(String port)
     {
-        this.portElement.clear();
-        this.portElement.sendKeys(port);
+        setValue("port", port);
     }
 
     /**
@@ -138,8 +102,7 @@ public class KrokiConfigurationEntryEditPage extends InlinePage
      */
     public void setHealthCheckPath(String healthCheckPath)
     {
-        this.healthPathElement.clear();
-        this.healthPathElement.sendKeys(healthCheckPath);
+        setValue("healthCheckPath", healthCheckPath);
     }
 
     /**
@@ -147,8 +110,7 @@ public class KrokiConfigurationEntryEditPage extends InlinePage
      */
     public void setHealthCheckBody(String healthCheckBody)
     {
-        this.healthBodyElement.clear();
-        this.healthBodyElement.sendKeys(healthCheckBody);
+        setValue("healthCheckBody", healthCheckBody);
     }
 
     /**
@@ -156,8 +118,7 @@ public class KrokiConfigurationEntryEditPage extends InlinePage
      */
     public void setHealthCheckHTTPVerb(String healthCheckHTTPVerb)
     {
-        this.healthVerbElement.clear();
-        this.healthVerbElement.sendKeys(healthCheckHTTPVerb);
+        setValue("healthCheckHTTPVerb", healthCheckHTTPVerb);
     }
 
     /**
@@ -165,35 +126,22 @@ public class KrokiConfigurationEntryEditPage extends InlinePage
      */
     public void setHealthCheckAcceptedStatusCodes(Set<String> healthCheckAcceptedStatusCodes)
     {
-        for (String statusCode : healthCheckAcceptedStatusCodes) {
-            if (statusCode.equals("200")) {
-                this.healthStatusCodesElement.findElement(By.id("xwiki-form-healthCheckAcceptedStatusCodes-0-0"))
-                    .click();
-            }
-            if (statusCode.equals("201")) {
-                this.healthStatusCodesElement.findElement(By.id("xwiki-form-healthCheckAcceptedStatusCodes-0-1"))
-                    .click();
-            }
-            if (statusCode.equals("202")) {
-                this.healthStatusCodesElement.findElement(By.id("xwiki-form-healthCheckAcceptedStatusCodes-0-2"))
-                    .click();
-            }
-            if (statusCode.equals("203")) {
-                this.healthStatusCodesElement.findElement(By.id("xwiki-form-healthCheckAcceptedStatusCodes-0-3"))
-                    .click();
-            }
-            if (statusCode.equals("204")) {
-                this.healthStatusCodesElement.findElement(By.id("xwiki-form-healthCheckAcceptedStatusCodes-0-4"))
-                    .click();
-            }
-            if (statusCode.equals("205")) {
-                this.healthStatusCodesElement.findElement(By.id("xwiki-form-healthCheckAcceptedStatusCodes-0-5"))
-                    .click();
-            }
-            if (statusCode.equals("206")) {
-                this.healthStatusCodesElement.findElement(By.id("xwiki-form-healthCheckAcceptedStatusCodes-0-6"))
-                    .click();
-            }
-        }
+        List<WebElement> checkboxes =
+            getDriver().findElementsWithoutWaiting(By.name("XWiki.Kroki.ConfigClass_0_healthCheckAcceptedStatusCodes"));
+
+        // Make sure all check boxes are visible on the page by scrolling to the last check box.
+        checkboxes.stream().filter(WebElement::isDisplayed).reduce((first, second) -> second).map(lastCheckbox -> {
+            getDriver().scrollTo(lastCheckbox);
+            getDriver().createActions().moveToElement(lastCheckbox).perform();
+            return lastCheckbox;
+        });
+
+        // Clear the current selection.
+        checkboxes.stream().filter(WebElement::isSelected).forEach(WebElement::click);
+
+        // Select the specified status codes.
+        checkboxes.stream().filter(WebElement::isDisplayed)
+            .filter(checkbox -> healthCheckAcceptedStatusCodes.contains(checkbox.getAttribute("value")))
+            .forEach(WebElement::click);
     }
 }

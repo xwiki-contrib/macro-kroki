@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.4" reference="XWiki.Kroki.Translations.WebHome" locale="">
-  <web>XWiki.Kroki.Translations</web>
-  <name>WebHome</name>
+<xwikidoc version="1.4" reference="XWiki.Kroki.Translations" locale="">
+  <web>XWiki.Kroki</web>
+  <name>Translations</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.Kroki.WebHome</parent>
+  <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -36,11 +36,21 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>kroki.configurationName=Configuration Name
-kroki.doc.date=Last Update Date
+  <content>admin.kroki=Kroki Macro
+admin.kroki.description=Configure the Docker containers used by the Kroki macro to render various diagram types.
+
+kroki.config=Kroki Configuration
+kroki.config.hint=The Kroki macro renders diagrams using multiple Docker containers, each supporting a set of diagram types. If you need to render a diagram type that is not supported by the configured Docker containers then you have to find a Docker container that supports it and add a new configuration page for it.
+kroki.config.create=Create configuration
+
+kroki.configurationName=Configuration Name
+kroki.diagramTypes=Diagram Types
+kroki.doc.location=Location
+kroki.doc.date=Date
+kroki.doc.author=Last Author
 kroki._actions=Actions</content>
   <object>
-    <name>XWiki.Kroki.Translations.WebHome</name>
+    <name>XWiki.Kroki.Translations</name>
     <number>0</number>
     <className>XWiki.TranslationDocumentClass</className>
     <guid>e365ff86-b3c0-4971-bbd7-8f13e5a1cafc</guid>

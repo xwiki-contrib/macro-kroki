@@ -31,28 +31,12 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Kroki Configurations</title>
+  <title>$services.localization.render('kroki.config')</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set($columns = ["configurationName", "doc.date", "_actions"])
-#set($columnsProperties = {
-    "configurationName" : { "type" : "text", "link" : "view", "html" : "true", "sortable":true },
-    "_actions" : {"actions": ["edit","delete"]}
-})
-#set($options = {
-   "className":"XWiki.Kroki.ConfigClass",
-   "translationPrefix" : "kroki.",
-   "tagCloud" : true,
-   "rowCount": 10
-})
-#livetable("kroki" $columns $columnsProperties $options)
-{{/velocity}}
-
-
-{{velocity}}
 #if("$!request.docName" != '')
   ## Request for creating a new instance
   #set($docName = ${request.docName})
@@ -63,30 +47,44 @@
   #end
 #end
 
-= Create a new configuration =
-
 #if("$!targetDocName" != '' &amp;&amp; $xwiki.exists($targetDocName))
   {{warning}}The target document already exists. Please choose a different name, or [[view the existing document&gt;&gt;$targetDocName]]{{/warning}}
 #elseif("$!targetDocName" != '')
   {{warning}}You don't have permission to create that document{{/warning}}
 #end
 
-{{html}}
-  &lt;form action="" id="newdoc" method="post"&gt;
-    &lt;div&gt;
-      &lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
-      &lt;input type="hidden" name="template" value="XWiki.Kroki.ConfigTemplate"/&gt;
-      &lt;input type="hidden" name="sheet" value="1"/&gt;
-      &lt;input type="hidden" name="spaceName" value="XWiki.Kroki"/&gt;
-      Document: &lt;input type="text" name="docName" value="Enter the new configurations name" class="withTip" size="50"/&gt;
-      &lt;span class="buttonwrapper"&gt;&lt;input name="createConfigBtn" type="submit" value="Create this
-    Configuration"
-    class="button"/&gt;&lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/form&gt;
+{{html clean="false"}}
+&lt;form action="" id="newdoc" method="post"&gt;
+  &lt;fieldset&gt;
+    &lt;p&gt;$escapetool.xml($services.localization.render('kroki.config.hint'))&lt;/p&gt;
+    &lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
+    &lt;input type="hidden" name="template" value="XWiki.Kroki.ConfigTemplate"/&gt;
+    &lt;input type="hidden" name="sheet" value="1"/&gt;
+    &lt;input type="hidden" name="spaceName" value="XWiki.Kroki"/&gt;
+    &lt;input type="text" name="docName" size="50" required
+      placeholder="$escapetool.xml($services.localization.render('kroki.configurationName'))" /&gt;
+    &lt;span class="buttonwrapper"&gt;
+      &lt;input name="createConfigBtn" type="submit" class="button"
+        value="$escapetool.xml($services.localization.render('kroki.config.create'))" /&gt;
+    &lt;/span&gt;
+  &lt;/fieldset&gt;
+&lt;/form&gt;
+
+#set ($columns = ['configurationName', 'diagramTypes', 'doc.location', 'doc.date', 'doc.author', '_actions'])
+#set ($columnsProperties = {
+  'configurationName': {'type': 'text', 'link': 'view', 'html': 'true', 'sortable': true},
+  '_actions': {'actions': ['edit', 'delete']}
+})
+#set ($options = {
+  'className': 'XWiki.Kroki.ConfigClass',
+  'translationPrefix': 'kroki.',
+  'tagCloud': true,
+  'rowCount': 10,
+  'outputOnlyHtml': true
+})
+#livetable('krokiConfigPages' $columns $columnsProperties $options)
 {{/html}}
-{{/velocity}}
-</content>
+{{/velocity}}</content>
   <object>
     <name>XWiki.Kroki.WebHome</name>
     <number>0</number>
@@ -325,10 +323,10 @@
       <displayInCategory/>
     </property>
     <property>
-      <displayInSection>Kroki Configuration</displayInSection>
+      <displayInSection>kroki</displayInSection>
     </property>
     <property>
-      <heading>Kroki Configuration</heading>
+      <heading/>
     </property>
     <property>
       <iconAttachment/>
@@ -344,43 +342,6 @@
     </property>
     <property>
       <sectionOrder/>
-    </property>
-  </object>
-  <object>
-    <name>XWiki.Kroki.WebHome</name>
-    <number>0</number>
-    <className>XWiki.TagClass</className>
-    <guid>1472b204-1c6f-4c11-995c-fd9d60233602</guid>
-    <class>
-      <name>XWiki.TagClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <tags>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
-        <multiSelect>1</multiSelect>
-        <name>tags</name>
-        <number>1</number>
-        <prettyName>Tags</prettyName>
-        <relationalStorage>1</relationalStorage>
-        <separator>|</separator>
-        <separators>|,</separators>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <values/>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </tags>
-    </class>
-    <property>
-      <tags/>
     </property>
   </object>
 </xwikidoc>
