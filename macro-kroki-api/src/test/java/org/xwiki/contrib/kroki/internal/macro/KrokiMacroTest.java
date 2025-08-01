@@ -19,25 +19,20 @@
  */
 package org.xwiki.contrib.kroki.internal.macro;
 
-import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.contrib.kroki.internal.caching.DiagramCacheManager;
 import org.xwiki.contrib.kroki.macro.KrokiMacroParameters;
+import org.xwiki.contrib.kroki.renderer.DiagramRenderer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.block.Block;
@@ -49,8 +44,6 @@ import org.xwiki.rendering.internal.renderer.event.EventRendererFactory;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.PrintRenderer;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.resource.ResourceReferenceSerializer;
@@ -58,7 +51,6 @@ import org.xwiki.resource.SerializeResourceReferenceException;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.resource.temporary.TemporaryResourceReference;
 import org.xwiki.resource.temporary.TemporaryResourceStore;
-import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -68,7 +60,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.url.ExtendedURL;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -76,8 +68,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.xwiki.contrib.kroki.renderer.DiagramRenderer;
 
 @ComponentTest
 @ComponentList({ EventBlockRenderer.class, EventRendererFactory.class, EventRenderer.class })
